@@ -1,35 +1,35 @@
 //const a = Vars.content.getByName(ContentType.unit,"ares-ares");
 //print(Vars.content.getByName(ContentType.unit,"ares-ares").name);
 const a = extend(UnitType, "ares", {
-  
   /*drawWeapons(unit){
   }*/
 });
-
-
-//event kills all spawned units
-/*
-Events.on(UnitCreateEvent, e => {
-  e.unit.health = 0;
-});*/
-
-
 a.constructor = () => extend(UnitEntity, {});
+
+//checks for units spawned by an Ares unit
+Events.on(UnitCreateEvent, e => {
+  if(e.spawner == a){
+  }
+  else{e.unit.health = 0;}
+});
+
+
+
 //Blocks.airFactory.plans = Blocks.airFactory.plans.put(UnitFactory.UnitPlan(a, 60 * 30, ItemStack.with(Items.copper, 2)));
-//secondary bullet frag
 
 
 const controllernew = extend(AIController, {
 
 });
 
-/*const turretnew = extend(Turret,{
-  updateShooting(){
+//messed up the game's global.js line 41
+/*const t = extend(Turret, {
+  shoot(type){
+    effects();
+  }
 });*/
 
 //event listernerns dont need loope
-
-
 const sbf = extend(BasicBulletType, {
   width: 5,
   height: 7,
@@ -133,6 +133,10 @@ for(let i = 0; i < 5; i++){
   }*/
   a.weapons.add(w2);
 }}
+
+/*a.isShooting().onchange = function(){
+  a.weapons.get(0).reload = 0.1;
+}*/
 /*
 a.weapons.get(9).reload = 5;
 
