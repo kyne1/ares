@@ -1,14 +1,23 @@
 //const a = Vars.content.getByName(ContentType.unit,"ares-ares");
 //print(Vars.content.getByName(ContentType.unit,"ares-ares").name);
 const a = extend(UnitType, "ares", {
-  drawWeapons(unit){
-    unit.time;
-  }  
+  
+  /*drawWeapons(unit){
+  }*/
 });
+
+
+//event kills all spawned units
+/*
+Events.on(UnitCreateEvent, e => {
+  e.unit.health = 0;
+});*/
+
 
 a.constructor = () => extend(UnitEntity, {});
 //Blocks.airFactory.plans = Blocks.airFactory.plans.put(UnitFactory.UnitPlan(a, 60 * 30, ItemStack.with(Items.copper, 2)));
 //secondary bullet frag
+
 
 const controllernew = extend(AIController, {
 
@@ -16,19 +25,10 @@ const controllernew = extend(AIController, {
 
 /*const turretnew = extend(Turret,{
   updateShooting(){
-    if(reload >= reloadTime){
-        type = peekAmmo();
-
-        shoot(type);
-
-        reload = 0;
-    }else{
-        reload += delta() * peekAmmo().reloadMultiplier * baseReloadSpeed() *Math.random();
-    }
-  }
 });*/
 
 //event listernerns dont need loope
+
 
 const sbf = extend(BasicBulletType, {
   width: 5,
@@ -110,23 +110,23 @@ a.weapons.add(w1);
 //secondaries
 for(let i = 0; i < 5; i++){
   for(let j = -1; j < 2; j += 2){
-var w2 = extendContent(Weapon, "secondaries", {
-  //load sprite
-  load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");}, 
-  shootY: 10,
-  reload: 9.5,
-  x: 25*j,
-  y: -36.5 + i * 20, //spacing 20 going up 5 times
-  shadow: 1,
-  rotateSpeed: 8,
-  rotate: true,
-  shots: 1,
-  shotDelay: 0,
-  inaccuracy: 3,
-  velocityRnd: 0.2,
-  shootSound: Sounds.shoot,
-  mirror: false,
-  bullet: sb
+    var w2 = extendContent(Weapon, "secondaries", {
+    //load sprite
+    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");}, 
+    shootY: 10,
+    reload: 9.5,
+    x: 25*j,
+    y: -36.5 + i * 20, //spacing 20 going up 5 times
+    shadow: 1,
+    rotateSpeed: 8,
+    rotate: true,
+    shots: 1,
+    shotDelay: 0,
+    inaccuracy: 3,
+    velocityRnd: 0.2,
+    shootSound: Sounds.shoot,
+    mirror: false,
+    bullet: sb
 });
   /*if(w2.isShooting()){
     this.reload = 1;
@@ -155,7 +155,7 @@ let arr = new Array();
 for(let i = 0; i < Blocks.airFactory.plans.size; i++){
   arr[i] = Blocks.airFactory.plans.get(i);
 }
-arr.push(UnitFactory.UnitPlan(a, 60 * 30, ItemStack.with(Items.copper, 2)));
+arr.push(UnitFactory.UnitPlan(a, 60 * 5, ItemStack.with(Items.copper, 2)));
 Blocks.airFactory.plans = Seq.with(arr);
 
 //.put()
