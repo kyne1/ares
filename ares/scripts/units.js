@@ -6,13 +6,40 @@ const a = extend(UnitType, "ares", {
 });
 a.constructor = () => extend(UnitEntity, {});
 
-//checks for units spawned by an Ares unit
-Events.on(UnitCreateEvent, e => {
-  if(e.spawner == a){
-  }
-  else{e.unit.health = 0;}
+const z = extend(UnitType, "zenith2", {
 });
+z.constructor = () => extend(UnitEntity, {});
+const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 30,2500,60,10);
+const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
+/*const zshield = extend(ShieldRegenFieldAbility, {
+  load(){this.super$load();},
+  amount: 500,
+  max: 500,
+  reload: 150,
+  range: 10
+});*/
+z.abilities.add(zshield);
+a.abilities.add(ashield);
+//scripted unitcreateevent
+/*const ucreateE = extendContent(EventType,{
+  UnitCreateEvent(unit, maker){
+    this.unit = unit;
+    this.maker = maker;
+  }
+});*/
 
+//temporary patch to get units spawned by ares
+/*
+Events.on(UnitUnloadEvent, e => {
+  if(e.unit == UnitTypes.zenith){
+
+  }
+  else if(e.unit == UnitTypes.flare){
+
+  }
+  print(e.unit);
+});
+*/
 
 
 //Blocks.airFactory.plans = Blocks.airFactory.plans.put(UnitFactory.UnitPlan(a, 60 * 30, ItemStack.with(Items.copper, 2)));
@@ -35,8 +62,8 @@ const sbf = extend(BasicBulletType, {
   height: 7,
   lifetime: 30,
   speed: 5,
-  splashDamageRadius: 20,
-  splashDamage: 5,
+  damage: 10,
+  pierce: true,
   despawnEffect: Fx.none,
   hitEffect: Fx.none
 });
@@ -89,7 +116,7 @@ const mainshot = extend(ArtilleryBulletType, {
 //main gun
 const w1 = extendContent(Weapon, "main-cannon",{
   load(){this.super$load();this.region = Core.atlas.find("ares-main-cannon");},
-  
+
   rotate: true,
   rotateSpeed: 1.1,
   mirror: false,
@@ -112,7 +139,7 @@ for(let i = 0; i < 5; i++){
   for(let j = -1; j < 2; j += 2){
     var w2 = extendContent(Weapon, "secondaries", {
     //load sprite
-    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");}, 
+    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");},
     shootY: 10,
     reload: 9.5,
     x: 25*j,
@@ -127,12 +154,63 @@ for(let i = 0; i < 5; i++){
     shootSound: Sounds.shoot,
     mirror: false,
     bullet: sb
-});
+  });
   /*if(w2.isShooting()){
     this.reload = 1;
   }*/
   a.weapons.add(w2);
 }}
+
+var spawnZenith = extend(UnitSpawnAbility,{
+  load(){this.super$load();},
+
+  //add 'this.' if var undefined
+  unit: z,
+  spawnX: 0,
+  spawnY: 5,
+  spawnTime: 1200
+});
+
+var spawnFlare = extend(UnitSpawnAbility,{
+  load(){this.super$load();},
+  /*update(unit){
+    this.timer += Time.delta;
+    if(this.timer >= this.spawnTime && Units.canCreate(unit.team, this.unit)){
+        let x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
+        this.spawnEffect.at(x, y);
+        let u = this.unit.create(unit.team);
+        //Events.fire(new UnitUnloadEvent(u));
+        u.set(x, y);
+        //u.speed = 10;
+        u.rotation = unit.rotation;
+        if(!Vars.net.client()){
+            u.add();
+        }
+        this.timer = 0;
+    }
+  },*/
+  unit: UnitTypes.flare,
+  spawnX: 0,
+  spawnY: -35,
+  spawnTime: 120
+});
+
+/*var shield = extend(ShieldRegenFieldAbility, {
+  load(){this.super$load();},
+  amount: 2500,
+  max: 2500,
+  reload: 3000,
+  range: 560
+});*/
+
+for(let i = 0; i < 3; i++){
+a.abilities.add(spawnZenith);
+}
+
+//a.abilities.add(shield);
+a.abilities.add(spawnFlare);
+
+
 
 /*a.isShooting().onchange = function(){
   a.weapons.get(0).reload = 0.1;
