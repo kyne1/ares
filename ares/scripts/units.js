@@ -1,26 +1,28 @@
-//const a = Vars.content.getByName(ContentType.unit,"ares-ares");
-//print(Vars.content.getByName(ContentType.unit,"ares-ares").name);
+
 const a = extend(UnitType, "ares", {
   /*drawWeapons(unit){
   }*/
 });
 a.constructor = () => extend(UnitEntity, {});
 
-//checks for units spawned by an Ares unit
-Events.on(UnitCreateEvent, e => {
-  if(e.spawner == a){
+const z = extend(UnitType, "zenith2", {
+});
+z.constructor = () => extend(UnitEntity, {});
+
+
+//format ripped from goldmod
+const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 30,2500,60,10);
+const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
+
+//create and then change a controller
+/*const controllernew = extend(FlyingAI, {
+  UpdateWeapons(){
+    let mount = unit.mounts[0];
+    let weapon = mount.weapon;
+    weapon.aimX = 5;
   }
-  else{e.unit.health = 0;}
 });
-
-
-
-//Blocks.airFactory.plans = Blocks.airFactory.plans.put(UnitFactory.UnitPlan(a, 60 * 30, ItemStack.with(Items.copper, 2)));
-
-
-const controllernew = extend(AIController, {
-
-});
+UnitTypes.antumbra.defaultController = () => controllernew;*/
 
 //messed up the game's global.js line 41
 /*const t = extend(Turret, {
@@ -35,8 +37,8 @@ const sbf = extend(BasicBulletType, {
   height: 7,
   lifetime: 30,
   speed: 5,
-  splashDamageRadius: 20,
-  splashDamage: 5,
+  damage: 10,
+  pierce: true,
   despawnEffect: Fx.none,
   hitEffect: Fx.none
 });
@@ -89,7 +91,7 @@ const mainshot = extend(ArtilleryBulletType, {
 //main gun
 const w1 = extendContent(Weapon, "main-cannon",{
   load(){this.super$load();this.region = Core.atlas.find("ares-main-cannon");},
-  
+
   rotate: true,
   rotateSpeed: 1.1,
   mirror: false,
@@ -112,7 +114,7 @@ for(let i = 0; i < 5; i++){
   for(let j = -1; j < 2; j += 2){
     var w2 = extendContent(Weapon, "secondaries", {
     //load sprite
-    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");}, 
+    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");},
     shootY: 10,
     reload: 9.5,
     x: 25*j,
@@ -127,39 +129,45 @@ for(let i = 0; i < 5; i++){
     shootSound: Sounds.shoot,
     mirror: false,
     bullet: sb
-});
+  });
   /*if(w2.isShooting()){
     this.reload = 1;
   }*/
   a.weapons.add(w2);
 }}
 
-/*a.isShooting().onchange = function(){
-  a.weapons.get(0).reload = 0.1;
-}*/
-/*
-a.weapons.get(9).reload = 5;
+var spawnZenith = extend(UnitSpawnAbility,{
+  load(){this.super$load();},
 
-print("eeee");
-print(rld2);
-*/
-//a.onChange()
+  //add 'this.' if var undefined
+  unit: z,
+  spawnX: 0,
+  spawnY: 5,
+  spawnTime: 1200
+});
 
+var spawnFlare = extend(UnitSpawnAbility,{
+  load(){this.super$load();},
+  unit: UnitTypes.flare,
+  spawnX: 0,
+  spawnY: -35,
+  spawnTime: 120
+});
 
-/*for(let i = 0; i < Vars.content.units().size; i++){
-  if(Vars.content.units().get(i).name == "ares-ares"){
-    a = Vars.content.units().get(i);
-    print(a);
-  }
-}*/
+for(let i = 0; i < 3; i++){
+a.abilities.add(spawnZenith);
+}
 
+//a.abilities.add(shield);
+a.abilities.add(spawnFlare);
 
+module.exports = a;
 
 let arr = new Array();
 for(let i = 0; i < Blocks.airFactory.plans.size; i++){
   arr[i] = Blocks.airFactory.plans.get(i);
 }
-arr.push(UnitFactory.UnitPlan(a, 60 * 5, ItemStack.with(Items.copper, 2)));
+arr.push(UnitFactory.UnitPlan(a, 60 * 5, ItemStack.with()));
 Blocks.airFactory.plans = Seq.with(arr);
 
 //.put()

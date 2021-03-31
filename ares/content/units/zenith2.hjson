@@ -1,0 +1,48 @@
+name: zenith2
+health : 1800
+speed : 2.1
+accel : 0.04
+drag : 0.016
+flying : true
+range : 200
+hitSize : 18
+rotateShooting: false
+lowAltitude : true
+armor : 10
+engineOffset : 12
+engineSize : 3
+weapons:[
+  {
+  name: zenith-missiles
+  reload : 70
+  x : 7
+  rotate : true
+  shake : 1
+  shots : 8
+  inaccuracy : 6
+  velocityRnd : 0.2
+  shootSound : missile
+  mirror: true
+  recoil: 4
+  bullet:{
+      type: MissileBulletType
+      width : 8
+      height : 8
+      shrinkY : 0
+      drag : -0.005
+      homingRange : 90
+      keepVelocity : false
+      splashDamageRadius : 25
+      splashDamage : 20
+      lifetime : 120
+      trailColor : ff9933
+      backColor : ff9966
+      frontColor : ffcc99
+      hitEffect : blastExplosion
+      despawnEffect : blastExplosion
+      speed: 2.3
+      weaveScale : 6
+      weaveMag : 1
+    }
+  }
+]
