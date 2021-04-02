@@ -72,9 +72,9 @@ const slagfrag = extend(LiquidBulletType,{
 
 const mainshot = extend(ArtilleryBulletType, {
   frontColor: Color(255, 137, 0),
-  width: 7,
+  width: 4,
   height: 40,
-  shrinkY: 0,
+  shrinkY: 0.01,
   speed: 3.6,
   drag: 0,
   splashDamageRadius: 125,
@@ -88,26 +88,54 @@ const mainshot = extend(ArtilleryBulletType, {
   fragBullet: slagfrag
 });
 
-//main gun
-const w1 = extendContent(Weapon, "main-cannon",{
-  load(){this.super$load();this.region = Core.atlas.find("ares-main-cannon");},
+const blankshot = extend(BasicBulletType,{
+  lifetime: 0,
+  width: 0,
+  height: 0
+});
 
-  rotate: true,
-  rotateSpeed: 1.1,
-  mirror: false,
+var rspeed = 1.2
+//main gun
+const wm = extend(Weapon, "turret1base",{
+  load(){this.super$load();this.region = Core.atlas.find("ares-turret1base");},
   x: 0,
   y: 74,
-  reload: 90,
-  xRand: 8,
-  shootY: 25,
-  recoil: 4,
-  inaccuracy: 4,
-  shots: 3,
-  shotDelay: 5,
-  shootSound: Sounds.boom,
-  bullet: mainshot
+  rotate: true,
+  rotateSpeed: rspeed,
+  mirror: false,
+  recoil: 0,
+  reload: 1000000000000,
+  bullet: blankshot
 });
-a.weapons.add(w1);
+
+//im ashamed to bruteforce like this
+var span = 5;
+var delay = 0;
+var sides = ["L","M","R"]
+for(let i = 0; i < 3; i++){
+  let tempsides = sides[i];
+  let w1 = extend(Weapon, "gun"+tempsides,{
+    load(){this.super$load();this.region = Core.atlas.find("ares-gun"+tempsides);},
+    rotate: true,
+    rotateSpeed: rspeed,
+    mirror: false,
+    x: 0,
+    y: 74,
+    reload: 95,
+    //xRand: 8,
+    shootY: 14,
+    shootX: span*(i-1),
+    recoil: 12,
+    inaccuracy: 0,
+    shots: 1,
+    shotDelay: i*delay,
+    shootSound: Sounds.boom,
+    bullet: mainshot
+  });
+  a.weapons.add(w1);
+};
+a.weapons.add(wm);
+
 
 //secondaries
 for(let i = 0; i < 5; i++){
