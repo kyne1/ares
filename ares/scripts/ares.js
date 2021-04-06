@@ -1,10 +1,31 @@
 
+
 const a = extend(UnitType, "ares", {
   /*drawWeapons(unit){
   }*/
+  load() {
+		this.super$load();
+		this.region = Core.atlas.find(this.name);
+		this.tbase = Core.atlas.find("ares-turret1base");
+	}
 });
-a.constructor = () => extend(UnitEntity, {});
+a.constructor = () => extend(UnitEntity, {
+  draw(){
+    this.super$draw();
+    const x = 0;
+    const y = 74;
+    //routorio code
+    const r = this.rotation-90;
+    const sin = Mathf.sin(r);
+		const cos = Mathf.cos(r);
 
+    Draw.rect(a.tbase,
+      this.x + Angles.trnsx(r, x, y),
+			this.y + Angles.trnsy(r, x, y),
+      r + this.mounts[0].rotation
+    )
+  }
+});
 const z = extend(UnitType, "zenith2", {
 });
 z.constructor = () => extend(UnitEntity, {});
@@ -14,6 +35,34 @@ const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 35,140,180,10);
 //print(ta); //prints an adapter number, extend() success
 z.abilities.add(zshield);
 //a.abilities.add(ashield);
+
+var aExp = new Effect(30, e => {
+  //initial sparks and etc
+  Draw.color(Pal.missileYellow);
+
+  e.scaled(15, i => {
+    Lines.stroke(17 * i.fout());
+    Lines.circle(e.x, e.y, 4 + i.fin() * 50);
+  });
+
+  //smoke
+  Draw.color(Color.gray);
+
+  Angles.randLenVectors(e.id, 12, 2 + 50 * e.finpow(), (x, y) => {
+    Fill.circle(e.x + x, e.y + y, e.fout() * 10 + 0.5);
+  });
+
+  //
+  Draw.color(Pal.missileYellowBack);
+  Lines.stroke(e.fout());
+
+  Angles.randLenVectors(e.id + 1, 6, 1 + 50 * e.finpow(), (x, y) => {
+    Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1 + e.fout() * 4);
+  });
+});
+
+
+
 
 
 //create and then change a controller
@@ -75,6 +124,7 @@ const slagfrag = extend(LiquidBulletType,{
   damage: 51
 });
 
+
 const mainshot = extend(ArtilleryBulletType, {
   frontColor: Color(255, 137, 0),
   width: 4,
@@ -87,10 +137,10 @@ const mainshot = extend(ArtilleryBulletType, {
   status: StatusEffects.burning,
   lifetime: 190,
   trailEffect: Fx.artilleryTrail,
-  hitEffect: Fx.massiveExplosion,
+  hitEffect: aExp,
   keepVelocity: false,
-  fragBullets: 13,
-  fragBullet: slagfrag
+  /*fragBullets: 13,
+  fragBullet: slagfrag*/
 });
 
 const blankshot = extend(BasicBulletType,{
@@ -100,18 +150,6 @@ const blankshot = extend(BasicBulletType,{
 });
 
 var rspeed = 1.2
-//main gun
-const wm = extend(Weapon, "turret1base",{
-  load(){this.super$load();this.region = Core.atlas.find("ares-turret1base");},
-  x: 0,
-  y: 74,
-  rotate: true,
-  rotateSpeed: rspeed,
-  mirror: false,
-  recoil: 0,
-  reload: 1000,
-  bullet: blankshot
-});
 
 //im ashamed to bruteforce like this
 var span = 5;
@@ -131,7 +169,7 @@ for(let i = 0; i < 3; i++){
     shootY: 14,
     shootX: span*(i-1),
     recoil: 12,
-    inaccuracy: 0,
+    inaccuracy: 1.4,
     shots: 1,
     shotDelay: i*delay,
     shootSound: Sounds.boom,
@@ -139,33 +177,9 @@ for(let i = 0; i < 3; i++){
   });
   a.weapons.add(w1);
 };
-a.weapons.add(wm);
+//a.weapons.add(wm);
 
-//replaced by Shootability
-/*
-//secondaries
-for(let i = 0; i < 5; i++){
-  for(let j = -1; j < 2; j += 2){
-    var w2 = extendContent(Weapon, "secondaries", {
-    //load sprite
-    load(){this.super$load();this.region = Core.atlas.find("ares-secondaries");},
-    shootY: 10.5,
-    reload: 11 + 4*Math.random(),
-    x: 25*j,
-    y: -36.5 + i * 20, //spacing 20 going up 5 times
-    shadow: 1,
-    rotateSpeed: 8,
-    rotate: true,
-    shots: 1,
-    shotDelay: 0,
-    inaccuracy: 3,
-    velocityRnd: 0.2,
-    shootSound: Sounds.shoot,
-    mirror: false,
-    bullet: sb
-  });
-  a.weapons.add(w2);
-}};*/
+//secondaries replaced by shootability
 
 var spawnZenith = extend(UnitSpawnAbility,{
   load(){this.super$load();},
