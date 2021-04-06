@@ -141,7 +141,8 @@ for(let i = 0; i < 3; i++){
 };
 a.weapons.add(wm);
 
-
+//replaced by Shootability
+/*
 //secondaries
 for(let i = 0; i < 5; i++){
   for(let j = -1; j < 2; j += 2){
@@ -163,11 +164,8 @@ for(let i = 0; i < 5; i++){
     mirror: false,
     bullet: sb
   });
-  /*if(w2.isShooting()){
-    this.reload = 1;
-  }*/
   a.weapons.add(w2);
-}}
+}};*/
 
 var spawnZenith = extend(UnitSpawnAbility,{
   load(){this.super$load();},
