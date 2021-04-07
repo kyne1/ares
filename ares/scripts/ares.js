@@ -16,8 +16,8 @@ a.constructor = () => extend(UnitEntity, {
     const y = 74;
     //routorio code
     const r = this.rotation-90;
-    const sin = Mathf.sin(r);
-		const cos = Mathf.cos(r);
+    /*const sin = Mathf.sin(r);
+		const cos = Mathf.cos(r);*/
 
     Draw.rect(a.tbase,
       this.x + Angles.trnsx(r, x, y),
@@ -116,31 +116,24 @@ const sb = extend(BasicBulletType, {
 
 //module.exports = sbf;
 
-//main gun shot -> minshot
-const slagfrag = extend(LiquidBulletType,{
-  liquid: Liquids.slag,
-  lifetime: 18,
-  speed: 2,
-  damage: 51
-});
-
 
 const mainshot = extend(ArtilleryBulletType, {
   frontColor: Color(255, 137, 0),
   width: 4,
   height: 40,
-  shrinkY: 0.01,
-  speed: 3.6,
+  shrinkY: 0.015,
+  speed: 5.1,
   drag: 0,
   splashDamageRadius: 125,
-  splashDamage: 350,
+  splashDamage: 150,
+  damage: 120,
   status: StatusEffects.burning,
-  lifetime: 190,
+  lifetime: 144,
   trailEffect: Fx.artilleryTrail,
   hitEffect: aExp,
   keepVelocity: false,
-  /*fragBullets: 13,
-  fragBullet: slagfrag*/
+  lightning: 2,
+  lightningLength: 17.75
 });
 
 const blankshot = extend(BasicBulletType,{
