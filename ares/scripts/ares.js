@@ -36,26 +36,33 @@ const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 35,140,180,10);
 z.abilities.add(zshield);
 //a.abilities.add(ashield);
 
+
+
+//custom effects
 var aExp = new Effect(30, e => {
   //initial sparks and etc
   Draw.color(Pal.missileYellow);
 
   e.scaled(15, i => {
     Lines.stroke(17 * i.fout());
-    Lines.circle(e.x, e.y, 4 + i.fin() * 50);
+    Lines.circle(e.x, e.y, 4 + i.fin() * 63);
   });
 
   //smoke
   Draw.color(Color.gray);
 
-  Angles.randLenVectors(e.id, 12, 2 + 50 * e.finpow(), (x, y) => {
+  Angles.randLenVectors(e.id, 15, 5 + 50 * e.finpow(), (x, y) => {
     Fill.circle(e.x + x, e.y + y, e.fout() * 10 + 0.5);
   });
 
   //
   Draw.color(Pal.missileYellowBack);
   Lines.stroke(e.fout());
-
+  //glowing stuff
+  Angles.randLenVectors(e.id, 11, 5 + 13 * e.finpow(), (x, y) => {
+    Fill.circle(e.x + x, e.y + y, e.fout() * 5 + 0.5);
+  });
+  //shockwaves
   Angles.randLenVectors(e.id + 1, 6, 1 + 50 * e.finpow(), (x, y) => {
     Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1 + e.fout() * 4);
   });
@@ -118,18 +125,21 @@ const sb = extend(BasicBulletType, {
 
 
 const mainshot = extend(ArtilleryBulletType, {
+  //will add more later
+  update(b){
+    this.super$update(b)
+  },
   frontColor: Color(255, 137, 0),
   width: 4,
   height: 40,
-  shrinkY: 0.015,
-  speed: 5.1,
-  drag: 0,
+  shrinkY: 0.4,
+  speed: 3.8,
   splashDamageRadius: 125,
   splashDamage: 150,
   damage: 120,
   status: StatusEffects.burning,
-  lifetime: 144,
   trailEffect: Fx.artilleryTrail,
+  lifetime: 144,
   hitEffect: aExp,
   keepVelocity: false,
   lightning: 2,
@@ -165,7 +175,7 @@ for(let i = 0; i < 3; i++){
     inaccuracy: 1.4,
     shots: 1,
     shotDelay: i*delay,
-    shootSound: Sounds.boom,
+    shootSound: Sounds.artillery,
     bullet: mainshot
   });
   a.weapons.add(w1);
@@ -188,7 +198,7 @@ var spawnFlare = extend(UnitSpawnAbility,{
   load(){this.super$load();},
   unit: UnitTypes.flare,
   spawnX: 0,
-  spawnY: -35,
+  spawnY: -17,
   spawnTime: 120
 });
 

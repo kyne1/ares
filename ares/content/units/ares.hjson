@@ -17,4 +17,6 @@ trailScl: 2.8
 research: eclipse
 range: 270
 flying: true
+engineOffset : 65
+engineSize : 13.2
 lowAltitude: true

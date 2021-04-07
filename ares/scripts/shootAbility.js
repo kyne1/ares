@@ -1,17 +1,28 @@
+//weapon variables
 var reload = 10;
 var timer = {};
 var spread = 12;
-var range = 270;
-var rows = 3;//at least 2
-var yspan = 80;
+var range = 230;
+var rows = 4;//at least 2
 var rspeed = 3;
 var firecone = 5;
-var yoffset = 15;
+
+//general positionings
+var yspan = 80;
+var ystart = 55;
+
+//properties for each turret
+var yoffset = 15; //bullet offset from barrel
+var xradaroffset = 5;
+
+//deafen it
+var shootSound = Sounds.shoot;
 
 //for each pair, on one side (right), then mirror it.
 //back , front
 var anglelimit = [
     [110,-75], //back
+    [75,-75], //middle
     [75,-75], //middle
     [75,-120], //front
 ];
@@ -85,14 +96,15 @@ const ta = extend(Ability, {
                 //ripped from aicontroller.java in anuke/mindustry
                 let rotation = unit.rotation - 90;
                 let mount = new Vec2(
-                    unit.x + Angles.trnsx(rotation, 50*j - 25, yspan/(rows-1)*i - 36.5),
-                    unit.y + Angles.trnsy(rotation, 50*j - 25, yspan/(rows-1)*i - 36.5)
+                    unit.x + Angles.trnsx(rotation, 50*j - 25, yspan/(rows-1)*i - ystart),
+                    unit.y + Angles.trnsy(rotation, 50*j - 25, yspan/(rows-1)*i - ystart)
                     );
 
                 timer[iter] += Time.delta;
-                let target = Units.closestTarget(unit.team, mount.x, mount.y, range);
+                let target = Units.closestTarget(unit.team, mount.x - xradaroffset + 2*xradaroffset*j, mount.y, range);
                 //print(target);//detects target correclty and loops
                 
+
                 //turret control pt 2
                 if(j==1){
                     //right guns
@@ -147,6 +159,7 @@ const ta = extend(Ability, {
                             mount.y + Math.sin(Math.PI*mrotation[iter]/180)*yoffset, 
                             mrotation[iter] - spread/2 + spread*Math.random());
                         //print("proc");
+                        shootSound.at(mount);
                     }
                 }
             }
@@ -161,8 +174,8 @@ const ta = extend(Ability, {
                 var iter = i+rows*j;
                 Draw.rect(
                     turret,
-                    unit.x + Angles.trnsx(r, 50*j - 25, yspan/(rows-1)*i - 36.5),
-		        	unit.y + Angles.trnsy(r, 50*j - 25, yspan/(rows-1)*i - 36.5),
+                    unit.x + Angles.trnsx(r, 50*j - 25, yspan/(rows-1)*i - ystart),
+		        	unit.y + Angles.trnsy(r, 50*j - 25, yspan/(rows-1)*i - ystart),
                     mrotation[iter] - 90
                 )
             }
