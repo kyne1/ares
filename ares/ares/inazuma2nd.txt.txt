@@ -1,0 +1,272 @@
+weapons: [
+    {
+      name: inazuma-main
+      rotate: true
+      rotateSpeed: 1.1
+      mirror: false
+      x: 0
+      y: 74
+      reload: 90
+      xRand: 8
+      shootY: 25
+      recoil: 4
+      inaccuracy: 4
+      shots: 3
+      shotDelay: 5
+      shootSound: boom
+      bullet: {
+        type: ArtilleryBulletType
+        frontColor: ff8900
+        width: 7
+        height: 40
+        shrinkY: 0
+        speed: 3.6
+        drag: 0
+        splashDamageRadius: 125
+        splashDamage: 350
+        status: burning
+        lifetime: 190
+        trailEffect: smoke
+        hitEffect: massiveExplosion
+        keepVelocity: false
+        fragBullets: 13
+        fragBullet: {
+          type: liquidBulletType
+          liquid: slag
+          lifetime: 18
+          speed: 2
+          damage: 51
+          }
+        }
+    }      
+	{
+    name: inazuma-2nd
+    shootY: 10
+    reload: 9.5
+    x: 25
+    y: -16.5
+    shadow: 1
+    rotateSpeed: 8
+    rotate: true
+    shots: 1
+    shotDelay: 0
+    inaccuracy: 3
+    velocityRnd: 0.2
+    shootSound: shoot
+    bullet: {
+      type: BasicBulletType
+      width: 7
+      height: 11
+      shrinkY: 0
+      speed: 12
+      drag: 0
+      damage: 70
+      splashDamageRadius: 25
+      splashDamage: 14
+
+
+      makeFire: true
+
+      status: burning
+      lifetime: 28
+      trailEffect: smoke
+      fragBullets: 7
+      fragCone: 70
+      fragBullet: {
+        type: BasicBulletType
+        width: 5
+        height: 7
+        lifetime: 43
+        speed: 3
+
+
+
+        splashDamageRadius: 10
+        splashDamage: 3
+despawnEffect: none
+        }
+      }
+    }
+    {
+    name: inazuma-2nd
+    shootY: 10
+    reload: 9.5
+    x: 25
+    y: -36.5
+    shadow: 1
+    rotateSpeed: 8
+    rotate: true
+    shots: 1
+    shotDelay: 0
+    inaccuracy: 3
+    velocityRnd: 0.2
+    shootSound: shoot
+    bullet: {
+      type: BasicBulletType
+      width: 7
+      height: 11
+      shrinkY: 0
+      speed: 12
+      drag: 0
+      damage: 70
+      splashDamageRadius: 25
+      splashDamage: 14
+
+
+      makeFire: true
+
+      status: burning
+      lifetime: 28
+      fragBullets: 7
+      fragCone: 70
+      fragBullet: {
+        type: BasicBulletType
+        width: 5
+        height: 7
+        lifetime: 43
+        speed: 3
+
+
+
+        splashDamageRadius: 10
+        splashDamage: 3
+        despawnEffect: none
+        }
+    }
+  }
+    {
+    name: inazuma-2nd
+    shootY: 10
+    reload: 9.5
+    x: 25
+    y: 3.5
+    shadow: 1
+    rotateSpeed: 8
+    rotate: true
+    shots: 1
+    shotDelay: 0
+    inaccuracy: 3
+    velocityRnd: 0.2
+    shootSound: shoot
+    bullet: {
+      type: BasicBulletType
+      width: 7
+      height: 11
+      shrinkY: 0
+      speed: 12
+      drag: 0
+      damage: 70
+      splashDamageRadius: 25
+      splashDamage: 14
+
+
+      makeFire: true
+
+      status: burning
+      lifetime: 28
+      fragBullets: 7
+      fragCone: 70
+      fragBullet: {
+        type: BasicBulletType
+        width: 5
+        height: 7
+        lifetime: 43
+        speed: 3
+
+
+
+        splashDamageRadius: 10
+        splashDamage: 3
+        despawnEffect: none
+        }
+    }
+  }
+    {
+    name: inazuma-2nd
+    shootY: 10
+    reload: 9.5
+    x: 25
+    y: 23.5
+    shadow: 1
+    rotateSpeed: 8
+    rotate: true
+    shots: 1
+    shotDelay: 0
+    inaccuracy: 3
+    velocityRnd: 0.2
+    shootSound: shoot
+    bullet: {
+      type: BasicBulletType
+      width: 7
+      height: 11
+      shrinkY: 0
+      speed: 12
+      drag: 0
+      damage: 70
+      splashDamageRadius: 25
+      splashDamage: 14
+
+
+      makeFire: true
+
+      status: burning
+      lifetime: 28
+      fragBullets: 7
+      fragCone: 70
+      fragBullet: {
+        type: BasicBulletType
+        width: 5
+        height: 7
+        lifetime: 25
+        speed: 3
+
+
+
+        splashDamageRadius: 10
+        splashDamage: 3
+        despawnEffect: none
+        }
+    }
+  }
+    {
+    name: inazuma-2nd
+    shootY: 10
+    reload: 9.5
+    x: 25
+    y: 43.5
+    shadow: 1
+    rotateSpeed: 8
+    rotate: true
+    shots: 1
+    shotDelay: 0
+    inaccuracy: 3
+    velocityRnd: 0.2
+    shootSound: shoot
+    bullet: {
+      type: BasicBulletType
+      width: 7
+      height: 11
+      shrinkY: 0
+      speed: 12
+      drag: 0
+      damage: 70
+      splashDamageRadius: 25
+      splashDamage: 14
+      makeFire: true
+      status: burning
+      lifetime: 28
+      fragBullets: 7
+      fragCone: 70
+      fragBullet: {
+        type: BasicBulletType
+        width: 5
+        height: 7
+        lifetime: 43
+        speed: 3
+        splashDamageRadius: 10
+        splashDamage: 3
+        despawnEffect: none
+      }
+    }
+  }
+]

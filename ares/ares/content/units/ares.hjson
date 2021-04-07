@@ -1,0 +1,20 @@
+name: ares
+localizedName: ares
+description: Heavy hitting floating cruiser. Has aircraft factories and a set of powerful secondary and primary batteries. Due to its complexity, heavy hitting projectiles can easily destroy it.
+health: 6000
+type: flying
+speed: 1.8
+accel: 0.004
+rotateSpeed: 0.3
+drag: 0.004
+hitSize: 85
+armor: 45
+rotateShooting: false
+trailLength: 35
+trailX: 12
+trailY: 18
+trailScl: 2.8
+research: eclipse
+range: 270
+flying: true
+lowAltitude: true
