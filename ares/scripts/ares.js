@@ -43,15 +43,18 @@ var aExp = new Effect(30, e => {
   //initial sparks and etc
   Draw.color(Pal.missileYellow);
 
-  e.scaled(15, i => {
-    Lines.stroke(17 * i.fout());
-    Lines.circle(e.x, e.y, 4 + i.fin() * 63);
+  e.scaled(6, i => {
+    Lines.circle(e.x, e.y, 4 + i.fin() * 77);
+  });
+
+  e.scaled(25,i =>{
+    Lines.stroke(40 * i.fout());
   });
 
   //smoke
   Draw.color(Color.gray);
 
-  Angles.randLenVectors(e.id, 15, 5 + 50 * e.finpow(), (x, y) => {
+  Angles.randLenVectors(e.id, 45, 5 + 50 * e.finpow(), (x, y) => {
     Fill.circle(e.x + x, e.y + y, e.fout() * 10 + 0.5);
   });
 
@@ -59,7 +62,7 @@ var aExp = new Effect(30, e => {
   Draw.color(Pal.missileYellowBack);
   Lines.stroke(e.fout());
   //glowing stuff
-  Angles.randLenVectors(e.id, 11, 5 + 13 * e.finpow(), (x, y) => {
+  Angles.randLenVectors(e.id, 45, 5 + 13 * e.finpow(), (x, y) => {
     Fill.circle(e.x + x, e.y + y, e.fout() * 5 + 0.5);
   });
   //shockwaves
@@ -133,13 +136,13 @@ const mainshot = extend(ArtilleryBulletType, {
   width: 4,
   height: 40,
   shrinkY: 0.4,
-  speed: 3.8,
-  splashDamageRadius: 125,
-  splashDamage: 150,
-  damage: 120,
+  speed: 3.2,
+  splashDamageRadius: 117,
+  splashDamage: 155,
+  damage: 140,
   status: StatusEffects.burning,
   trailEffect: Fx.artilleryTrail,
-  lifetime: 144,
+  lifetime: 164,
   hitEffect: aExp,
   keepVelocity: false,
   lightning: 2,
@@ -167,11 +170,11 @@ for(let i = 0; i < 3; i++){
     mirror: false,
     x: 0,
     y: 74,
-    reload: 95,
+    reload: 103,
     //xRand: 8,
     shootY: 14,
     shootX: span*(i-1),
-    recoil: 12,
+    recoil: 13,
     inaccuracy: 1.4,
     shots: 1,
     shotDelay: i*delay,
@@ -186,8 +189,20 @@ for(let i = 0; i < 3; i++){
 
 var spawnZenith = extend(UnitSpawnAbility,{
   load(){this.super$load();},
-
   //add 'this.' if var undefined
+  update(unit){
+    this.super$update(unit);
+  },
+  //@override
+  draw(unit){
+    //super.draw(unit);
+    //this.super$draw(unit);
+    Draw.draw(Draw.z(), () => {
+        var x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
+        
+        Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, Math.min(1, this.timer/this.spawnTime), 1, this.timer);
+    });
+  },
   unit: z,
   spawnX: 0,
   spawnY: 5,
@@ -196,10 +211,24 @@ var spawnZenith = extend(UnitSpawnAbility,{
 
 var spawnFlare = extend(UnitSpawnAbility,{
   load(){this.super$load();},
+  //did this to access the protected var 'timer', dont remove
+  update(unit){
+    this.super$update(unit);
+  },
+  //@override
+  draw(unit){
+    //super.draw(unit);
+    //this.super$draw(unit);
+    Draw.draw(Draw.z(), () => {
+        var x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
+        
+        Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, Math.min(1, this.timer/this.spawnTime), 1, this.timer);
+    });
+  },
   unit: UnitTypes.flare,
   spawnX: 0,
   spawnY: -17,
-  spawnTime: 120
+  spawnTime: 150 //default 120
 });
 
 for(let i = 0; i < 3; i++){

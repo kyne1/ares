@@ -7,7 +7,7 @@ var rows = 4;//at least 2
 var rspeed = 3;
 var firecone = 5;
 
-//general positionings
+//turret general positionings
 var yspan = 80;
 var ystart = 55;
 
@@ -16,7 +16,7 @@ var yoffset = 15; //bullet offset from barrel
 var xradaroffset = 5;
 
 //deafen it
-var shootSound = Sounds.shoot;
+var shootSound = loadSound("secondaryshoot");
 
 //for each pair, on one side (right), then mirror it.
 //back , front
@@ -30,8 +30,8 @@ var anglelimit = [
 
 
 //function variables pre-initialized -- dont touch
-var rto = {}; //target rotation
-var mrotation = {}; //mount rotation
+var rto = {}; //rotate to
+var mrotation = {}; //mount rotation 
 var m;
 
 
@@ -55,6 +55,13 @@ const bullet = extend(BasicBulletType, {
     hitEffect: Fx.plasticExplosion
 });
 
+
+//took from stackoverflow anon
+/*
+@params float, float
+
+use it like angle1 - angle2
+*/
 function angleDifference(from, to){
     let difference = to - from;
     while (difference < -180) difference += 360;
@@ -63,12 +70,6 @@ function angleDifference(from, to){
 }
 
 //flipping an angle down a line perpendicular to the wraparound
-/*
-    90deg
-     |_   0deg
-     |
-   -90deg
-*/
 function flip90(angle){
     if(angle >= 0){
         return 180-angle;
