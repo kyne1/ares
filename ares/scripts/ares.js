@@ -71,27 +71,6 @@ var aExp = new Effect(30, e => {
   });
 });
 
-
-
-
-
-//create and then change a controller
-/*const controllernew = extend(FlyingAI, {
-  UpdateWeapons(){
-    let mount = unit.mounts[0];
-    let weapon = mount.weapon;
-    weapon.aimX = 5;
-  }
-});
-UnitTypes.antumbra.defaultController = () => controllernew;*/
-
-//messed up the game's global.js line 41
-/*const t = extend(Turret, {
-  shoot(type){
-    effects();
-  }
-});*/
-
 //event listernerns dont need loope
 const sbf = extend(BasicBulletType, {
   width: 5,
