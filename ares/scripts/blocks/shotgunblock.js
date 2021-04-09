@@ -17,6 +17,12 @@ const shotgun = extend(ItemTurret,"machete",{
         this.gunL = Core.atlas.find("ares-sgbarrelL");
         //this.gunmount = Core.atlas.find("ares-shotgunblock3");
 	},
+    icons(){
+        return [
+          this.baseRegion,
+          Core.atlas.find("ares-machete-icon")
+        ];
+    },
     description: "twin shotguns mounted on turret to fill your enemy with lead. Knocks back them back too.",
     range: 93,
     reloadTime: 1,
@@ -102,18 +108,22 @@ shotgun.buildType = ent => {
             let RposA = Math.atan2(Rpos.y,Rpos.x);
             let LposA = Math.atan2(Lpos.y,Lpos.x);
             //this.baseRegion undefined
+
             Draw.rect(shotgun.baseRegion, this.x, this.y, 0);
+
+            //how to layer
+            Draw.z(Layer.turret);
             Draw.rect(shotgun.gunL,
                  this.x + Math.cos(toRad(rotation) + RposA) * Vec2Len(Rpos),  
                  this.y + Math.sin(toRad(rotation) + RposA) * Vec2Len(Rpos), 
                  rotation
             ); 
-            print(this.x + Math.cos(toRad(rotation) + RposA) * Vec2Len(Rpos));
             Draw.rect(shotgun.gunR, 
                 this.x + Math.cos(toRad(rotation) + LposA) * Vec2Len(Lpos),  
                 this.y + Math.sin(toRad(rotation) + LposA) * Vec2Len(Lpos), 
                 rotation
             );
+            Draw.z(Layer.turret+1);
             Draw.rect(shotgun.gunmount, this.x, this.y, rotation); 
         },
         shoot(type){
@@ -155,7 +165,8 @@ shotgun.buildType = ent => {
             cdtimer += Time.delta;
             if(loaded > 0 && cdtimer >= cooldown && !this.charging){
                 //using 'this' prefix for the in the same class
-                this.shoot(leadshot);
+                type = this.peekAmmo()
+                this.shoot(type);
                 cdtimer = 0;
                 loaded--;
             }
