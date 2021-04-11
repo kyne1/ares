@@ -1,0 +1,9 @@
+{
+"name": "ares",
+"displayName": "[red]cheesing unit[]",
+"author": "nutmeg",
+"description": "test ship",
+"version": "1.0",
+"minGameVersion": "105",
+"dependencies": [ ],
+}
