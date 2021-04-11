@@ -19,6 +19,12 @@ var xradaroffset = 5;
 //deafen it
 var shootSound = loadSound("secondaryshoot");
 
+//paddle vars;
+var paddlex = 34;
+var paddlenum = 5; //per each side
+var paddlespan = 80;
+var paddlestart = 45; // positive is back neg is front, start at this coordinate and move to front
+
 //for each pair, on one side (right), then mirror it.
 //back , front
 var anglelimit = [
@@ -66,6 +72,25 @@ function flip90(angle){
     }
 }
 
+//difference of 2 vector over time
+function dpos(ip,fp,t){
+    return new Vec2((fp.x-ip.x)/t,(fp.y-ip.y)/t);
+}
+
+function Vec2Len(v){
+    return Math.sqrt(Math.pow(v.x,2)+Math.pow(v.y,2));
+}
+
+function toRad(angle){
+    return (angle * Math.PI/180);
+}
+
+function toDeg(angle){
+    return (angle * 180/Math.PI);
+}
+
+var unitsMap = new Map();
+
 /*turret setup:
 0  3
 1  4
@@ -75,16 +100,51 @@ function flip90(angle){
 //print("bullet "+ bullet);
 //ta for turret ability
 function getAbility(){
-    var timer = {};
-    var rto = {}; //rotate to
-    var mrotation = {}; //mount rotation 
-    for(let i = 0; i < 2*rows; i++){
-        timer[i] = 0;
-        rto[i] = 0;
-        mrotation[i] = -90;
-    }
-    const ta = extend(Ability, {
+    let ta = extend(Ability, {
+        /*init(){
+            this.super$init();
+            print("initialized");
+        },*/
         update(unit){
+            //poor man's init()
+            if(!unitsMap.has(unit.id+"timer")){
+                //local constants do work
+                //initialize
+                let timer = {};
+                let rto = {}; //rotate to
+                let mrotation = {}; //mount rotation
+                
+                //paddle variables
+                let paddlemove = {};//using ints wotn work when doing += 
+                let lastpos = {}; //Vec2 array
+                let lastrot = {};
+                let changepos = {};
+                let changerot = {};
+
+                //script
+                for(let i = 0; i < 2*rows; i++){
+                    paddlemove[i] = 0;
+                    timer[i] = 0;
+                    rto[i] = 0;
+                    mrotation[i] = -90;
+                    lastpos[i] = new Vec2(unit.x,unit.y);
+                    lastrot[i] = 0;
+                    changepos[i] = new Vec2(0,0);
+                    changerot[i] = 0
+                }
+                unitsMap.set(unit.id+"timer", timer);
+                unitsMap.set(unit.id+"rto",rto);
+                unitsMap.set(unit.id+"mrotation",mrotation);
+                unitsMap.set(unit.id+"paddlemove",paddlemove);
+                unitsMap.set(unit.id+"lastpos",lastpos);
+                unitsMap.set(unit.id+"lastrot",lastrot);
+                unitsMap.set(unit.id+"changepos",changepos);
+                unitsMap.set(unit.id+"changerot",changerot);
+            }
+            //import unit variables;
+            var timer = unitsMap.get(unit.id+"timer");
+            var rto = unitsMap.get(unit.id+"rto");
+            var mrotation = unitsMap.get(unit.id+"mrotation"); 
             for(let j = 0; j < 2; j++){
                 for(let i = 0; i < rows; i++){
                     var iter = i+rows*j;//iterate timer list
@@ -100,7 +160,9 @@ function getAbility(){
                     let target = Units.closestTarget(unit.team, mount.x - xradaroffset + 2*xradaroffset*j, mount.y, range);
                     //print(target);//detects target correclty and loops
                     
-    
+                    //turret 0 and 1 are not valid, seems to have vectors in them;
+                    //print("iter: " + iter + " rotation: " + mrotation[iter]);
+                    print
                     //turret control pt 2
                     if(j==1){
                         //right guns
@@ -160,21 +222,29 @@ function getAbility(){
             }
         },
         draw(unit){
-            var turret = Core.atlas.find("ares-secondaries");
+            //import unit variables
+            var mrotation = unitsMap.get(unit.id+"mrotation"); 
+            var paddlemove = unitsMap.get(unit.id+"paddlemove");
+            var lastpos = unitsMap.get(unit.id+"lastpos");
+            var lastrot = unitsMap.get(unit.id+"lastrot"); 
+            var changepos = unitsMap.get(unit.id+"changepos");
+            var changerot = unitsMap.get(unit.id+"changerot");
+
+
             //unit rotation instead of mount
             var r = unit.rotation-90; 
             for(let j = 0; j < 2; j++){
                 for(let i = 0; i < rows; i++){
                     var iter = i+rows*j;
-                    Draw.rect(
-                        turret,
+                    Draw.rect(a.secondaries,
                         unit.x + Angles.trnsx(r, 50*j - 25, yspan/(rows-1)*i - ystart),
                         unit.y + Angles.trnsy(r, 50*j - 25, yspan/(rows-1)*i - ystart),
                         mrotation[iter] - 90
                     )
                 }
             }
-            //moved from unit's draw() because bug when loaded up
+
+            //moved from ares's draw() because bug when loaded up
             const x = 0;
             const y = 74;
             //routorio code
@@ -186,12 +256,97 @@ function getAbility(){
             unit.y + Angles.trnsy(r, x, y),
             r + unit.mounts[0].rotation
             );
+
+            //ares paddle animations
+            lastpos[0] = new Vec2(unit.x,unit.y);
+            changepos[0] = dpos(lastpos[1], lastpos[0], Time.delta);
+            lastpos[1] = new Vec2(unit.x,unit.y);//will be past position becuase only deteced when loop around
+            
+            lastrot[0] = r;
+            changerot[0] = angleDifference(lastrot[0],lastrot[1])/Time.delta;
+            lastrot[1] = r;
+            var spacing = paddlespan/(paddlenum-1);
+
+ 
+            Draw.z(Layer.flyingUnitLow-1);
+            for(let j = -1; j < 2; j+=2){
+                //conv to array-fridendly variable
+                var k = Math.max(j,0);
+                //print(k);
+                //movement calculation in direction of facing with multiplier and accounting for rotation
+                paddlemove[k] += Math.sin(toRad(r)-Math.atan2(changepos[0].y,changepos[0].x))*Vec2Len(changepos[0])*2.3 + j*changerot[0]*2.5;
+                if(paddlemove[k] > spacing){
+                    paddlemove[k] -= spacing;
+                    //print(paddlemove[0]);
+                }
+                else if(paddlemove[k] < 0){
+                    paddlemove[k] += spacing;
+                }
+                //print(isNaN(paddlemove[k]));
+                //main movement
+                for(let i = 0; i < paddlenum; i++){
+                    let pos = new Vec2(
+                        j*paddlex,
+                        spacing*i - paddlestart + paddlemove[k]
+                    )
+                    // a.paddle, unit.paddle will not work
+                    //the ones on the end flickers for some reason
+                    Draw.rect(a.paddle,
+                        unit.x + Angles.trnsx(r,pos.x, pos.y),
+                        unit.y + Angles.trnsy(r,pos.x, pos.y),
+                        r
+                    )
+                    var radius = 12;
+                    var center = new Vec2(
+                        paddlex-radius,
+                        paddlestart - spacing/2 - paddlespan
+                    );
+                    
+                    //rotations
+                    var padrot = paddlemove[k]/spacing*90 - 90;
+                    var padrotfront = padrot + 90;
+                    
+                    //back
+                    if(i == 0){
+                        let pos = new Vec2(
+                            j*(center.x + radius*Math.cos(toRad(padrot))),
+                            center.y + radius*Math.sin(toRad(padrot)),
+                        )
+                        Draw.rect(a.paddle,
+                            unit.x + Angles.trnsx(r,pos.x, pos.y),
+                            unit.y + Angles.trnsy(r,pos.x, pos.y),
+                            j*padrot + r
+                        )
+                    }
+
+                    //front
+                    else if(i == paddlenum -1){
+                        let center = new Vec2(
+                            paddlex-radius,
+                            paddlestart + spacing/2
+                        );
+                        let pos = new Vec2(
+                            j*(center.x + radius*Math.cos(toRad(padrotfront))),
+                            center.y + radius*Math.sin(toRad(padrotfront)),
+                        );
+                        Draw.rect(a.paddle,
+                            unit.x + Angles.trnsx(r,pos.x, pos.y),
+                            unit.y + Angles.trnsy(r,pos.x, pos.y),
+                            j*padrotfront + r
+                        );
+                    }
+                }
+            }
+            
+        },
+        //change name/title
+        localized(){
+            return "smart secondary batteries";
         }
     });
     return ta;
 }
 
-//UnitTypes.gamma.abilities.add(ta); //test
-
+//adds this to all units of 'a' so no easy way out.
 a.abilities.add(getAbility());
 

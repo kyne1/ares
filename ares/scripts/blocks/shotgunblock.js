@@ -5,7 +5,7 @@ var shooty = 6;
 var loadround = 2;
 var maxload = 8;
 
-var shootsound = Sounds.shotgun;
+var shootsound = Sounds.shoot;
 var shootfx = Fx.shootSmall;
 
 const shotgun = extend(ItemTurret,"machete",{
@@ -23,6 +23,7 @@ const shotgun = extend(ItemTurret,"machete",{
           Core.atlas.find("ares-machete-icon")
         ];
     },
+    localizedName: "machete",
     description: "twin shotguns mounted on turret to fill your enemy with lead. Knocks back them back too.",
     range: 93,
     reloadTime: 1,
@@ -82,7 +83,7 @@ shotgun.buildType = ent => {
     var type;
     var timer = 0;
     var cdtimer = 0; //timer for cooldown
-    
+
     ent = extend(ItemTurret.ItemTurretBuild, shotgun,{
         updateTile(){
             this.super$updateTile();
@@ -114,17 +115,17 @@ shotgun.buildType = ent => {
             //how to layer
             Draw.z(Layer.turret);
             Draw.rect(shotgun.gunL,
-                 this.x + Math.cos(toRad(rotation) + RposA) * Vec2Len(Rpos),  
-                 this.y + Math.sin(toRad(rotation) + RposA) * Vec2Len(Rpos), 
+                 this.x + Math.cos(toRad(rotation) + RposA) * Vec2Len(Rpos),
+                 this.y + Math.sin(toRad(rotation) + RposA) * Vec2Len(Rpos),
                  rotation
-            ); 
-            Draw.rect(shotgun.gunR, 
-                this.x + Math.cos(toRad(rotation) + LposA) * Vec2Len(Lpos),  
-                this.y + Math.sin(toRad(rotation) + LposA) * Vec2Len(Lpos), 
+            );
+            Draw.rect(shotgun.gunR,
+                this.x + Math.cos(toRad(rotation) + LposA) * Vec2Len(Lpos),
+                this.y + Math.sin(toRad(rotation) + LposA) * Vec2Len(Lpos),
                 rotation
             );
             Draw.z(Layer.turret+1);
-            Draw.rect(shotgun.gunmount, this.x, this.y, rotation); 
+            Draw.rect(shotgun.gunmount, this.x, this.y, rotation);
         },
         shoot(type){
             this.useAmmo();
@@ -132,15 +133,15 @@ shotgun.buildType = ent => {
             let rotation = this.rotation;
             let pos = new Vec2(
                 shootx,
-                shooty,    
+                shooty,
             );
             let posA = Math.atan2(pos.y,pos.x);
             for(let i = 0; i < shotgun.shots; i++){
                 type.create(
                     this,
-                    this.team, 
-                    this.x + Math.cos(toRad(rotation-90)+ posA)*Vec2Len(pos), 
-                    this.y + Math.sin(toRad(rotation-90)+ posA)*Vec2Len(pos), 
+                    this.team,
+                    this.x + Math.cos(toRad(rotation-90)+ posA)*Vec2Len(pos),
+                    this.y + Math.sin(toRad(rotation-90)+ posA)*Vec2Len(pos),
                     rotation + Mathf.range(shotgun.inaccuracy)
                 );
             }
@@ -159,12 +160,13 @@ shotgun.buildType = ent => {
                 recoilR = shotgun.recoil;
             }
             shootL = !shootL;
-            
+
         },
         updateShooting(){
             cdtimer += Time.delta;
             if(loaded > 0 && cdtimer >= cooldown && !this.charging){
                 //using 'this' prefix for the in the same class
+                //deadass overriden updateshooting and forgot to set type
                 type = this.peekAmmo()
                 this.shoot(type);
                 cdtimer = 0;

@@ -7,11 +7,27 @@ const a = extend(UnitType, "ares", {
 		this.super$load();
 		this.region = Core.atlas.find(this.name);
 		this.tbase = Core.atlas.find("ares-turret1base");
-	}
+    this.secondaries = Core.atlas.find("ares-secondaries");
+    this.paddle = Core.atlas.find("ares-ares-paddle");
+	},
+  init(){
+    this.super$init();
+    //print("fajdlkfjdslflkjdlk");
+    //reads this when loading the game
+  },
+  localizedName: "icarus",
 });
 
 a.constructor = () => extend(UnitEntity, {
+  //this doesnt even get read at all
+  init(){
+    this.super$init();
+    //this.gru = "h";
+    //print(gdafsdfa);
+  }
 });
+
+
 
 //refresh(a);
 
@@ -121,16 +137,14 @@ const mainshot = extend(ArtilleryBulletType, {
   height: 40,
   shrinkY: 0.4,
   speed: 3.2,
-  splashDamageRadius: 117,
-  splashDamage: 155,
-  damage: 140,
+  splashDamageRadius: 110,
+  splashDamage: 170,
+  damage: 224,
   status: StatusEffects.burning,
   trailEffect: Fx.artilleryTrail,
   lifetime: 164,
   hitEffect: aExp,
   keepVelocity: false,
-  lightning: 2,
-  lightningLength: 17.75
 });
 
 const blankshot = extend(BasicBulletType,{
@@ -203,6 +217,7 @@ var spawnFlare = extend(UnitSpawnAbility,{
   draw(unit){
     //super.draw(unit);
     //this.super$draw(unit);
+    //changed draw to always draw regardless of cancreate. My unit is too plain
     Draw.draw(Draw.z(), () => {
         var x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
         
@@ -215,9 +230,7 @@ var spawnFlare = extend(UnitSpawnAbility,{
   spawnTime: 150 //default 120
 });
 
-for(let i = 0; i < 3; i++){
 a.abilities.add(spawnZenith);
-}
 
 //a.abilities.add(shield);
 a.abilities.add(spawnFlare);

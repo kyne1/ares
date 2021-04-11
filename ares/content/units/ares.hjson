@@ -1,8 +1,8 @@
 name: ares
-description: Heavy hitting floating cruiser. Has aircraft factories and a set of powerful secondary and primary batteries. Due to its complexity, heavy hitting projectiles can easily destroy it.
+description: Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.
 health: 6000
 type: flying
-speed: 1.8
+speed: 1.2
 accel: 0.004
 rotateSpeed: 0.3
 drag: 0.004
