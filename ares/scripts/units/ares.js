@@ -1,44 +1,81 @@
+const refresh = require("libs/refresh");
+const spawn = require('abilities/customUnitSpawn');
+
+function getUnit(){
+  const unit = extend(UnitType, "ares", {  
+    /*drawWeapons(unit){
+    }*/
+    load() {
+      this.super$load();
+      this.region = Core.atlas.find(this.name);
+      this.tbase = Core.atlas.find("ares-turret1base");
+      this.secondaries = Core.atlas.find("ares-secondaries");
+      this.paddle = Core.atlas.find("ares-ares-paddle");
+    },
+    init(){
+      this.super$init();
+      this.localizedName = "icarus";
+      //print("fajdlkfjdslflkjdlk");
+      //reads this when loading the game
+    },
+    //name:"ares",
+    description: "Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
+    health: 6000,
+    //type: flying,
+    speed: 1.2,
+    accel: 0.004,
+    rotateSpeed: 0.3,
+    drag: 0.004,
+    hitSize: 85,
+    armor: 45,
+    rotateShooting: false,
+    trailLength: 35,
+    trailX: 12,        
+    trailY: 18,
+    trailScl: 2.8,
+    research: UnitTypes.eclipse,
+    range: 270,
+    flying: true,
+    engineOffset : 65,
+    engineSize : 13.2,
+    lowAltitude: true
+  });
+
+  unit.constructor = () => extend(UnitEntity, {
+    //yes it works, a different var per unit, but will start from different var than saved when loaded
+    //h: Math.random(),
+
+    //VERY IMPORTANT DO NOT DELETE OR METHODS NO WORK
+    classId: () => unit.classId,
+    //update only work when spawn
+    update(){
+      this.super$update();
+    },
+    killed(){
+      this.super$killed();
+      Fx.massiveExplosion.at(this.x,this.y,this.rotation);
+    },
+  });
+  return unit;
+}
+
+const a = getUnit();
+refresh(a);
 
 
-const a = extend(UnitType, "ares", {
-  /*drawWeapons(unit){
-  }*/
-  load() {
-		this.super$load();
-		this.region = Core.atlas.find(this.name);
-		this.tbase = Core.atlas.find("ares-turret1base");
-    this.secondaries = Core.atlas.find("ares-secondaries");
-    this.paddle = Core.atlas.find("ares-ares-paddle");
-	},
-  init(){
-    this.super$init();
-    //print("fajdlkfjdslflkjdlk");
-    //reads this when loading the game
-  },
-  localizedName: "icarus",
+//zenith 2
+const z = extend(UnitType, "zenith2", {
 });
-
-a.constructor = () => extend(UnitEntity, {
-  //this doesnt even get read at all
-  init(){
-    this.super$init();
-    //this.gru = "h";
-    //print(gdafsdfa);
+z.constructor = () => extend(UnitEntity, {
+  classId: () => z.classId,
+  killed(){
+    this.super$killed();
   }
 });
 
-
-
-//refresh(a);
-
-
-const z = extend(UnitType, "zenith2", {
-});
-z.constructor = () => extend(UnitEntity, {});
 //format ripped from goldmod, (amt, max, rld, range)
-const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 35,140,180,10);
+const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 32,140,180,10);
 //const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
-//print(ta); //prints an adapter number, extend() success
 z.abilities.add(zshield);
 //a.abilities.add(ashield);
 
@@ -183,52 +220,9 @@ for(let i = 0; i < 3; i++){
 };
 //a.weapons.add(wm);
 
-//secondaries replaced by shootability
+var spawnZenith = spawn(z,0,5,1200);
+var spawnFlare = spawn(UnitTypes.flare,0,-17,150);
 
-var spawnZenith = extend(UnitSpawnAbility,{
-  load(){this.super$load();},
-  //add 'this.var' if var undefined
-  update(unit){
-    this.super$update(unit);
-  },
-  //@override
-  draw(unit){
-    //super.draw(unit);
-    //this.super$draw(unit);
-    Draw.draw(Draw.z(), () => {
-        var x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
-        
-        Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, Math.min(1, this.timer/this.spawnTime), 1, this.timer);
-    });
-  },
-  unit: z,
-  spawnX: 0,
-  spawnY: 5,
-  spawnTime: 1200
-});
-
-var spawnFlare = extend(UnitSpawnAbility,{
-  load(){this.super$load();},
-  //did this to access the protected var 'timer', dont remove
-  update(unit){
-    this.super$update(unit);
-  },
-  //@override
-  draw(unit){
-    //super.draw(unit);
-    //this.super$draw(unit);
-    //changed draw to always draw regardless of cancreate. My unit is too plain
-    Draw.draw(Draw.z(), () => {
-        var x = unit.x + Angles.trnsx(unit.rotation, this.spawnY, this.spawnX), y = unit.y + Angles.trnsy(unit.rotation, this.spawnY, this.spawnX);
-        
-        Drawf.construct(x, y, this.unit.icon(Cicon.full), unit.rotation - 90, Math.min(1, this.timer/this.spawnTime), 1, this.timer);
-    });
-  },
-  unit: UnitTypes.flare,
-  spawnX: 0,
-  spawnY: -17,
-  spawnTime: 150 //default 120
-});
 
 a.abilities.add(spawnZenith);
 

@@ -1,9 +1,10 @@
+//this is more like a addon to ares unit than an ability
 const a = require('units/ares');
 
 //weapon variables
 var reload = 10;
 var spread = 12;
-var range = 230;
+var range = 220; // radar range
 var rows = 4;//at least 2
 var rspeed = 3;
 var firecone = 5;
@@ -13,8 +14,8 @@ var yspan = 80;
 var ystart = 55;
 
 //properties for each turret
-var yoffset = 15; //bullet offset from barrel
-var xradaroffset = 5;
+var yoffset = 15.4; //bullet offset from barrel
+var xradaroffset = 30;
 
 //deafen it
 var shootSound = loadSound("secondaryshoot");
@@ -37,7 +38,7 @@ var anglelimit = [
 const bullet = extend(BasicBulletType, {
     width: 7,
     height: 15,
-    lifetime: 55,
+    lifetime: 30,
     speed: 12,
     damage: 65,
     splashDamageRadius: 2,
@@ -145,6 +146,8 @@ function getAbility(){
             var timer = unitsMap.get(unit.id+"timer");
             var rto = unitsMap.get(unit.id+"rto");
             var mrotation = unitsMap.get(unit.id+"mrotation"); 
+            var changerot = unitsMap.get(unit.id+"changerot");
+            
             for(let j = 0; j < 2; j++){
                 for(let i = 0; i < rows; i++){
                     var iter = i+rows*j;//iterate timer list
@@ -162,7 +165,6 @@ function getAbility(){
                     
                     //turret 0 and 1 are not valid, seems to have vectors in them;
                     //print("iter: " + iter + " rotation: " + mrotation[iter]);
-                    print
                     //turret control pt 2
                     if(j==1){
                         //right guns
@@ -196,17 +198,6 @@ function getAbility(){
                         let to = Predict.intercept(mount, target, bullet.speed);
                         rto[iter] = 180*Math.atan2(to.y-mount.y,to.x-mount.x)/Math.PI;
     
-                        //turret controls
-                        if(Math.abs(angleDifference(rto[iter],mrotation[iter])) <= Time.delta*rspeed){
-                            mrotation[iter] = rto[iter];
-                        }
-                        else if(angleDifference(mrotation[iter],rto[iter]) > 0){
-                            mrotation[iter] += Time.delta*rspeed;
-                        }
-                        else{
-                            mrotation[iter] -= Time.delta*rspeed
-                        }
-    
                         if(timer[iter] >= reload && Math.abs(mrotation[iter] - rto[iter])<=firecone){
                             timer[iter] = 0;
                             bullet.create(unit,
@@ -217,6 +208,32 @@ function getAbility(){
                             //print("proc");
                             shootSound.at(mount);
                         }
+                    }
+                    else{
+                        if(j > 0){
+                            rto[iter] = (anglelimit[rows-i-1][0]+anglelimit[rows-i-1][1])/2 + rotation;
+                        }
+                        else{
+                            //stupid angle wrapping
+                            let targetangle = (anglelimit[rows-i-1][0]+anglelimit[rows-i-1][1])/2;
+                            if(targetangle >= 0){
+                                rto[iter] = 180-targetangle+rotation;
+                            }
+                            else{
+                                rto[iter] = -180-targetangle+rotation;
+                            }
+                        }
+                    }
+
+                    //move turret to rto
+                    if(Math.abs(angleDifference(rto[iter],mrotation[iter])) <= Time.delta*rspeed){
+                        mrotation[iter] = rto[iter];
+                    }
+                    else if(angleDifference(mrotation[iter],rto[iter]) > 0){
+                        mrotation[iter] += Time.delta*rspeed;
+                    }
+                    else{
+                        mrotation[iter] -= Time.delta*rspeed
                     }
                 }
             }
