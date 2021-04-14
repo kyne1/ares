@@ -14,11 +14,9 @@ function getUnit(){
     },
     init(){
       this.super$init();
+      //trick to renaming it without screwing stuff up
       this.localizedName = "icarus";
-      //print("fajdlkfjdslflkjdlk");
-      //reads this when loading the game
     },
-    //name:"ares",
     description: "Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
     health: 6000,
     //type: flying,
@@ -170,6 +168,8 @@ const mainshot = extend(ArtilleryBulletType, {
     this.super$update(b)
   },
   frontColor: Color(255, 137, 0),
+  //remove if crash
+  collides: false,
   width: 4,
   height: 40,
   shrinkY: 0.4,
