@@ -47,6 +47,7 @@ const leadshot = extend(BasicBulletType,{
     lifetime: 23,
     width: 5,
     height: 8,
+    knockback: 4,
     pierce: false
 });
 

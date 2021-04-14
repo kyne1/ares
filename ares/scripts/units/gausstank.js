@@ -1,8 +1,31 @@
 const refresh = require("libs/refresh");
 const apbullet = require("bullets/armorpiercing");
 
+
+
+//modifiers
+function aMod(a){
+    if(a<3){
+        return 0.4;
+    }
+    else{
+        return -(a-2)*(a-30)/28
+    }
+}
+function pMod(a){
+    if(a<4){
+        return 0.1;
+    }
+    else return Math.pow(a,3)/100;
+}
+
+const tankbullet = apbullet(aMod,pMod);
+tankbullet.despawnEffect = Fx.hitBulletBig;
+tankbullet.hitEffect = Fx.hitBulletBig;
+tankbullet.lifetime = 30;
+
 const tankgun = extend(Weapon, "gaussgun",{
-    bullet: apbullet(),
+    bullet: tankbullet,
     load(){
         this.super$load();
         this.region = Core.atlas.find("ares-" + this.name);
@@ -18,10 +41,10 @@ const tankgun = extend(Weapon, "gaussgun",{
     shootY: -4,
     shootX: 0,
     recoil: 3,
-    inaccuracy: 1.4,
+    inaccuracy: 0.9,
     //restitution: 0.3,
     shots: 1,
-    shootSound: Sounds.shoot,
+    shootSound: Sounds.shotgun,
 });
 
 const tank = extend(UnitType, "gausstank",{
@@ -47,22 +70,20 @@ const tank = extend(UnitType, "gausstank",{
             unit.y + Angles.trnsy(unit.rotation-90,tankgun.x,tankgun.y) + Angles.trnsy(mrotation + unit.rotation-90,0,recoil),
             unit.rotation + mrotation - 90
         );
-        print(mrotation);
-        //print(this.turretcell);
         Draw.reset();
     },
     description: "placeholder",
-    health: 680,
+    health: 355,
     //type: flying,
     speed: 0.78,
-    accel: 0.07,
-    drag: 0.13,
-    hitSize: 30,
+    accel: 0.06,
+    drag: 0.05,
+    hitSize: 28,
     armor: 20,
     rotateShooting: false,
     rotateSpeed: 1.4,
     research: UnitTypes.dagger,
-    range: 185,
+    range: 160,
     //get rid of leg animation
     mechFrontSway: 0,
     mechSideSway: 0,
