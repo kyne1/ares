@@ -1,83 +1,7 @@
 const refresh = require("libs/refresh");
 const spawn = require('abilities/customUnitSpawn');
 
-function getUnit(){
-  const unit = extend(UnitType, "ares", {  
-    /*drawWeapons(unit){
-    }*/
-    load() {
-      this.super$load();
-      this.region = Core.atlas.find(this.name);
-      this.tbase = Core.atlas.find("ares-turret1base");
-      this.secondaries = Core.atlas.find("ares-secondaries");
-      this.paddle = Core.atlas.find("ares-ares-paddle");
-    },
-    init(){
-      this.super$init();
-      //trick to renaming it without screwing stuff up
-      this.localizedName = "icarus";
-    },
-    description: "Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
-    health: 6000,
-    //type: flying,
-    speed: 1.2,
-    accel: 0.004,
-    rotateSpeed: 0.3,
-    drag: 0.004,
-    hitSize: 85,
-    armor: 45,
-    rotateShooting: false,
-    trailLength: 35,
-    trailX: 12,        
-    trailY: 18,
-    trailScl: 2.8,
-    research: UnitTypes.eclipse,
-    range: 270,
-    flying: true,
-    engineOffset : 65,
-    engineSize : 13.2,
-    lowAltitude: true
-  });
-
-  unit.constructor = () => extend(UnitEntity, {
-    //yes it works, a different var per unit, but will start from different var than saved when loaded
-    //h: Math.random(),
-
-    //VERY IMPORTANT DO NOT DELETE OR METHODS NO WORK
-    classId: () => unit.classId,
-    //update only work when spawn
-    update(){
-      this.super$update();
-    },
-    killed(){
-      this.super$killed();
-      Fx.massiveExplosion.at(this.x,this.y,this.rotation);
-    },
-  });
-  return unit;
-}
-
-const a = getUnit();
-refresh(a);
-
-
-//zenith 2
-const z = extend(UnitType, "zenith2", {
-});
-z.constructor = () => extend(UnitEntity, {
-  classId: () => z.classId,
-  killed(){
-    this.super$killed();
-  }
-});
-
-//format ripped from goldmod, (amt, max, rld, range)
-const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 32,140,180,10);
-//const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
-z.abilities.add(zshield);
-//a.abilities.add(ashield);
-
-
+var sides = ["L","M","R"];
 
 //custom effects
 //(duration, spawner reference)
@@ -127,6 +51,189 @@ var aExp = new Effect(80, e => {
   });
 });
 
+const blankshot = extend(BasicBulletType,{
+  lifetime: 0,
+  width: 0,
+  height: 0,
+  damage: 180
+});
+
+const mainshot = extend(ArtilleryBulletType, {
+  //will add more later
+  update(b){
+    this.super$update(b)
+  },
+  frontColor: Color(255, 137, 0),
+  //remove if crash
+  collides: false,
+  width: 4,
+  height: 40,
+  shrinkY: 0.4,
+  speed: 3.2,
+  splashDamageRadius: 98,
+  splashDamage: 305,
+  //direct damage doesnt work
+  //damage: 305,
+  status: StatusEffects.burning,
+  trailEffect: Fx.artilleryTrail,
+  shootEffect: Fx.none,
+  smokeEffect: Fx.none,
+  lifetime: 148,
+  hitEffect: aExp,
+  keepVelocity: false,
+  fragBullets: 1,
+  fragBullet: blankshot
+});
+
+
+
+var guns = {};
+var rspeed = 1.2
+//im ashamed to bruteforce like this
+var span = 5;
+var delay = 12;
+var res = 38;
+var rld = 288;
+for(let i = 0; i < 3; i++){
+  let tempsides = sides[i];
+  guns[i] = extend(Weapon, "gun"+tempsides,{
+    load(){
+      this.super$load();
+      //this.super$load();this.region = Core.atlas.find("ares-gun"+tempsides);
+    },
+    rotate: true,
+    rotateSpeed: rspeed,
+    mirror: false,
+    x: 0,
+    y: 74,
+    reload: rld,
+    //xRand: 8,
+    firstShotDelay: i*delay,
+    shootY: 18,
+    shootX: span*(i-1),
+    recoil: 13,
+    inaccuracy: 1.4,
+    shots: 1,
+    shootSound: Sounds.artillery,
+    bullet: mainshot,
+    restitution: rld - res
+  });
+};
+
+function getUnit(){
+  const unit = extend(UnitType, "ares", {  
+    /*drawWeapons(unit){
+    }*/
+    load() {
+      this.super$load();
+      this.region = Core.atlas.find(this.name);
+      this.tbase = Core.atlas.find("ares-turret1base");
+      this.secondaries = Core.atlas.find("ares-secondaries");
+      this.paddle = Core.atlas.find("ares-ares-paddle");
+      this.barrel = {}; //LMR
+      for(let i = 0; i < 3; i++){
+        let tempsides = sides[i];
+        this.barrel[i] = Core.atlas.find("ares-gun" + tempsides);
+      }
+    },
+    init(){
+      this.super$init();
+      //trick to renaming it without screwing stuff up
+      this.localizedName = "icarus";
+    },
+    description: "Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
+    health: 5600,
+    //type: flying,
+    speed: 1.2,
+    accel: 0.004,
+    rotateSpeed: 0.3,
+    drag: 0.004,
+    hitSize: 85,
+    armor: 23,
+    rotateShooting: false,
+    trailLength: 35,
+    trailX: 12,        
+    trailY: 18,
+    trailScl: 2.8,
+    research: UnitTypes.eclipse,
+    range: 255,
+    flying: true,
+    engineOffset : 65,
+    engineSize : 13.2,
+    lowAltitude: true
+  });
+
+  unit.constructor = () => extend(UnitEntity, {
+    //yes it works, a different var per unit, but will start from different var than saved when loaded
+    //h: Math.random(),
+
+    //VERY IMPORTANT DO NOT DELETE OR METHODS NO WORK
+    classId: () => unit.classId,
+    //update only work when spawn
+    update(){
+      this.super$update();
+    },
+    killed(){
+      this.super$killed();
+      Fx.massiveExplosion.at(this.x,this.y,this.rotation);
+    },
+    draw(){
+      this.super$draw();
+      Draw.z(Layer.flyingUnitLow+0.5); //between turret and ship
+      for(let i = 0; i < 3; i++){
+        let mrotation = this.mounts[i].rotation;
+        let recoil;
+        
+        //from maxreload to 0
+        if(this.mounts[i].reload > guns[i].reload-guns[i].firstShotDelay){
+          recoil = 0;
+        }
+        else recoil = -Math.max((this.mounts[i].reload + guns[i].firstShotDelay)-guns[i].restitution,0) / (guns[i].reload-guns[i].restitution) * guns[i].recoil;
+        
+        //brute force detect if gun recoiled/shot
+        if(Math.abs(this.mounts[i].reload - (guns[i].reload-guns[i].firstShotDelay)) < Time.delta/3 ){
+          let posx = this.x + Angles.trnsx(this.rotation-90,guns[i].x,guns[i].y) + Angles.trnsx(mrotation + this.rotation-90,guns[i].shootX,guns[i].shootY-4);
+          let posy = this.y + Angles.trnsy(this.rotation-90,guns[i].x,guns[i].y) + Angles.trnsy(mrotation + this.rotation-90,guns[i].shootX,guns[i].shootY-4);
+          Fx.shootBig.at(posx,posy,this.rotation + mrotation);
+          Fx.shootBigSmoke2.at(posx,posy,this.rotation + mrotation);
+        }
+        Draw.rect(
+            unit.barrel[i],
+            this.x + Angles.trnsx(this.rotation-90,guns[i].x,guns[i].y) + Angles.trnsx(mrotation + this.rotation-90,0,recoil),
+            this.y + Angles.trnsy(this.rotation-90,guns[i].x,guns[i].y) + Angles.trnsy(mrotation + this.rotation-90,0,recoil),
+            this.rotation + mrotation - 90
+        );
+      };
+      Draw.reset();
+    },
+  });
+  return unit;
+}
+
+const a = getUnit();
+refresh(a);
+
+for(let i = 0; i < 3; i ++){
+  a.weapons.add(guns[i]);
+}
+
+//zenith 2
+const z = extend(UnitType, "zenith2", {
+});
+z.constructor = () => extend(UnitEntity, {
+  classId: () => z.classId,
+  killed(){
+    this.super$killed();
+  }
+});
+
+//format ripped from goldmod, (amt, max, rld, range)
+const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 32,140,180,10);
+//const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
+z.abilities.add(zshield);
+//a.abilities.add(ashield);
+
+
 //event listernerns dont need loope
 const sbf = extend(BasicBulletType, {
   width: 5,
@@ -161,63 +268,6 @@ const sb = extend(BasicBulletType, {
 
 //module.exports = sbf;
 
-
-const mainshot = extend(ArtilleryBulletType, {
-  //will add more later
-  update(b){
-    this.super$update(b)
-  },
-  frontColor: Color(255, 137, 0),
-  //remove if crash
-  collides: false,
-  width: 4,
-  height: 40,
-  shrinkY: 0.4,
-  speed: 3.2,
-  splashDamageRadius: 110,
-  splashDamage: 170,
-  damage: 224,
-  status: StatusEffects.burning,
-  trailEffect: Fx.artilleryTrail,
-  lifetime: 164,
-  hitEffect: aExp,
-  keepVelocity: false,
-});
-
-const blankshot = extend(BasicBulletType,{
-  lifetime: 0,
-  width: 0,
-  height: 0
-});
-
-var rspeed = 1.2
-
-//im ashamed to bruteforce like this
-var span = 5;
-var delay = 0;
-var sides = ["L","M","R"]
-for(let i = 0; i < 3; i++){
-  let tempsides = sides[i];
-  let w1 = extend(Weapon, "gun"+tempsides,{
-    load(){this.super$load();this.region = Core.atlas.find("ares-gun"+tempsides);},
-    rotate: true,
-    rotateSpeed: rspeed,
-    mirror: false,
-    x: 0,
-    y: 74,
-    reload: 103,
-    //xRand: 8,
-    shootY: 14,
-    shootX: span*(i-1),
-    recoil: 13,
-    inaccuracy: 1.4,
-    shots: 1,
-    shotDelay: i*delay,
-    shootSound: Sounds.artillery,
-    bullet: mainshot
-  });
-  a.weapons.add(w1);
-};
 //a.weapons.add(wm);
 
 var spawnZenith = spawn(z,0,5,1200);

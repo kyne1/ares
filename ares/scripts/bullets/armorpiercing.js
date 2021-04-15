@@ -1,3 +1,5 @@
+const trail = require("fx/fixedtrail");
+
 
 //@params penmod, armormod are functions, see below.
 module.exports = function getBullet(armormod, penmod){
@@ -7,7 +9,13 @@ module.exports = function getBullet(armormod, penmod){
         //entity hitboxc -> can be treated as unit
         hitEntity( b,  entity,  initialHealth){
             if(entity instanceof Healthc){
-                entity.damage(armormod(entity.armor)*b.damage);
+                let a = armormod(entity.armor)
+                entity.damage(a*b.damage);
+                //print(a);
+                if(a > 2){
+                    penEf.at(b.x,b.y,b.rotation());
+                    Fx.blastsmoke.at(b.x,b.y,b.rotation());
+                }
             }
     
             if(entity instanceof Unit){
@@ -15,6 +23,11 @@ module.exports = function getBullet(armormod, penmod){
                 entity.apply(this.status, this.statusDuration);
             }
             b.time += penmod(entity.armor);
+        },
+        draw(b){
+            this.super$draw(b);
+            //print(b.x+" "+b.y+" "+b.rotation());
+            ef.at(b.x, b.y, b.rotation());
         },
         /*bcreate(  owner,  team,  x,  y,  angle,  damage,  velocityScl,  lifetimeScl,  data , b){
             let bullet = Bullet.create();
@@ -39,16 +52,17 @@ module.exports = function getBullet(armormod, penmod){
             if(this.keepVelocity && owner instanceof Velc) bullet.vel.add(owner.vel.x, owner.vel.y);
             return bullet;
         },*/
-        width: 7,
-        height: 11,
+        width: 5,
+        height: 16,
         shrinkY: 0,
-        speed: 12,
+        speed: 16.6,
         drag: 0,
-        damage: 50, //treated as baseDamage
+        damage: 60, //treated as baseDamage
         //makeFire: true,
         //status: StatusEffects.burning,
-        lifetime: 28,
-        pierce: true
+        lifetime: 26,
+        pierce: true,
+        pierceBuilding: true
         });
     return bull;
 }
@@ -70,3 +84,31 @@ function aMod(a){
 function pMod(a){
     return 1;
 }
+
+//effect
+const ef = new Effect(6, e => {
+    for(let i = 0; i < 2; i++){
+        Draw.color(i == 0 ? Pal.thoriumPink : Pal.bulletYellow);
+        var m = i == 0 ? 1 : 0.5;
+  
+        var rot = e.rotation + 180;
+        var w = 15 * e.fout() * m - 2;
+        Drawf.tri(e.x, e.y, w, (30 + Mathf.randomSeedRange(e.id, 15)) * m, rot);
+        Drawf.tri(e.x, e.y, w, 10 * m, rot + 180);
+    }
+});
+
+const penEf = new Effect(5, 130, e => {
+    for(let i = 0; i < 2; i++){
+        Draw.color(i == 0 ? Pal.thoriumPink : Pal.bulletYellow);
+        
+        let m = i == 0 ? 1 : 0.5;
+
+        for(let j = 0; j < 5; j++){
+            let rot = e.rotation + Mathf.randomSeedRange(e.id + j, 50);
+            let w = 14 * e.fout() * m;
+            Drawf.tri(e.x, e.y, w, (40 + Mathf.randomSeedRange(e.id + j, 30)) * m, rot);
+            Drawf.tri(e.x, e.y, w, 20 * m, rot + 180);
+        }
+    }
+});

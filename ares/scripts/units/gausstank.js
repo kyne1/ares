@@ -5,24 +5,30 @@ const apbullet = require("bullets/armorpiercing");
 
 //modifiers
 function aMod(a){
+    //overpen
     if(a<3){
-        return 0.4;
+        return 0.3 + 0.1 * a;
     }
+    //normal armor mod
     else{
-        return -(a-2)*(a-30)/28
+        return -(a-2.5)*(a-25)/20;
     }
 }
 function pMod(a){
     if(a<4){
-        return 0.1;
+        return a*0.5;
     }
-    else return Math.pow(a,3)/100;
+    else return Math.pow(a,3)/30;
 }
 
 const tankbullet = apbullet(aMod,pMod);
-tankbullet.despawnEffect = Fx.hitBulletBig;
-tankbullet.hitEffect = Fx.hitBulletBig;
-tankbullet.lifetime = 30;
+tankbullet.despawnEffect = Fx.flakExplosion;
+tankbullet.hitEffect = Fx.hitBulletSmall;
+tankbullet.shootEffect = tankbullet.smokeEffect = Fx.thoriumShoot;
+tankbullet.lifetime = 24;
+tankbullet.speed = 19;
+tankbullet.damage = 64;
+
 
 const tankgun = extend(Weapon, "gaussgun",{
     bullet: tankbullet,
@@ -36,9 +42,9 @@ const tankgun = extend(Weapon, "gaussgun",{
     mirror: false,
     x: 0,
     y: 0,
-    reload: 140,
+    reload: 150,
     //xRand: 8,
-    shootY: -4,
+    shootY: 20,
     shootX: 0,
     recoil: 3,
     inaccuracy: 0.9,
@@ -48,6 +54,7 @@ const tankgun = extend(Weapon, "gaussgun",{
 });
 
 const tank = extend(UnitType, "gausstank",{
+    
     load(){
         this.super$load();
         this.region = Core.atlas.find(this.name);
@@ -73,13 +80,13 @@ const tank = extend(UnitType, "gausstank",{
         Draw.reset();
     },
     description: "placeholder",
-    health: 355,
+    health: 560,
     //type: flying,
     speed: 0.78,
     accel: 0.06,
     drag: 0.05,
-    hitSize: 28,
-    armor: 20,
+    hitSize: 24,
+    armor: 11,
     rotateShooting: false,
     rotateSpeed: 1.4,
     research: UnitTypes.dagger,

@@ -1,6 +1,7 @@
 //this is more like a addon to ares unit than an ability
+const refresh = require("libs/refresh");
 const a = require('units/ares');
-
+refresh(a);
 //weapon variables
 var reload = 10;
 var spread = 12;
@@ -246,8 +247,6 @@ function getAbility(){
             var lastrot = unitsMap.get(unit.id+"lastrot"); 
             var changepos = unitsMap.get(unit.id+"changepos");
             var changerot = unitsMap.get(unit.id+"changerot");
-
-
             //unit rotation instead of mount
             var r = unit.rotation-90; 
             for(let j = 0; j < 2; j++){
@@ -267,7 +266,7 @@ function getAbility(){
             //routorio code
             /*const sin = Mathf.sin(r);
                 const cos = Mathf.cos(r);*/
-
+            Draw.z(Layer.flyingUnitLow+1);
             Draw.rect(a.tbase,
             unit.x + Angles.trnsx(r, x, y),
             unit.y + Angles.trnsy(r, x, y),

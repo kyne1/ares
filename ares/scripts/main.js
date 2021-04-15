@@ -10,5 +10,6 @@ require('blocks/shotgunblock');
 require('bullets/armorpiercing');
 
 require('libs/refresh');
+require('fx/fixedtrail');
 //require('effects.js');
 //require('wcompchange');
