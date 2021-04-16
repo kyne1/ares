@@ -70,10 +70,10 @@ const mainshot = extend(ArtilleryBulletType, {
   height: 40,
   shrinkY: 0.4,
   speed: 3.2,
-  splashDamageRadius: 98,
-  splashDamage: 305,
+  splashDamageRadius: 71,
+  splashDamage: 365,
   //direct damage doesnt work
-  //damage: 305,
+  damage: 400,
   status: StatusEffects.burning,
   trailEffect: Fx.artilleryTrail,
   shootEffect: Fx.none,
@@ -82,7 +82,8 @@ const mainshot = extend(ArtilleryBulletType, {
   hitEffect: aExp,
   keepVelocity: false,
   fragBullets: 1,
-  fragBullet: blankshot
+  fragBullet: blankshot,
+  absorbable: true,
 });
 
 

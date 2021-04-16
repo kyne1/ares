@@ -36,21 +36,24 @@ const tankgun = extend(Weapon, "gaussgun",{
         this.super$load();
         this.region = Core.atlas.find("ares-" + this.name);
         this.outlineRegion = Core.atlas.find("ares-"+ this.name + "-outline");
+        this.heatRegion = Core.atlas.find("ares-"+ this.name + "-heat");
     },
     rotate: true,
     rotateSpeed: 2.1,
     mirror: false,
     x: 0,
-    y: 0,
+    y: 2,
     reload: 150,
     //xRand: 8,
     shootY: 20,
+    shootCone: 3,
     shootX: 0,
     recoil: 3,
-    inaccuracy: 0.9,
+    inaccuracy: 0,
     //restitution: 0.3,
     shots: 1,
     shootSound: Sounds.shotgun,
+    cooldownTime: 180
 });
 
 //unit
@@ -59,7 +62,7 @@ const tank = extend(UnitType, "gausstank",{
     load(){
         this.super$load();
         this.region = Core.atlas.find(this.name);
-        this.turretcell = Core.atlas.find("ares-gaussguncell");
+        this.turretcell = Core.atlas.find("ares-gaussgun-cell");
         this.track = Core.atlas.find("ares-gausstank-track");
     },
     init(){
@@ -159,11 +162,11 @@ tank.constructor = () => extend(MechUnit,{
                 r
             );
             
-            if(this.trackmove[k] > spacing){
+            while(this.trackmove[k] > spacing){
                 this.trackmove[k] -= spacing;
                 //print(this.trackmove[0]);
             }
-            else if(this.trackmove[k] < 0){
+            while(this.trackmove[k] < 0){
                 this.trackmove[k] += spacing;
             }
 

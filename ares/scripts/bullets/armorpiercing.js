@@ -24,6 +24,18 @@ module.exports = function getBullet(armormod, penmod){
             }
             b.time += penmod(entity.armor);
         },
+        hitTile( b,  build,  initialHealth,  direct){
+            this.super$hitTile(b,  build,  initialHealth,  direct);
+            let h = Math.sqrt(build.maxHealth)/11;
+            let a = armormod(h);
+            //print(h);
+            if(a > 2){
+                penEf.at(b.x,b.y,b.rotation());
+                Fx.blastsmoke.at(b.x,b.y,b.rotation());
+            }
+            build.damage(Math.max(b.damage*(a-1),0));
+            b.time += penmod(h);
+        },
         draw(b){
             this.super$draw(b);
             //print(b.x+" "+b.y+" "+b.rotation());
