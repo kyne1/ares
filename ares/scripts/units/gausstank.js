@@ -29,7 +29,7 @@ tankbullet.lifetime = 24;
 tankbullet.speed = 19;
 tankbullet.damage = 64;
 
-
+//gun
 const tankgun = extend(Weapon, "gaussgun",{
     bullet: tankbullet,
     load(){
@@ -53,12 +53,14 @@ const tankgun = extend(Weapon, "gaussgun",{
     shootSound: Sounds.shotgun,
 });
 
+//unit
 const tank = extend(UnitType, "gausstank",{
     
     load(){
         this.super$load();
         this.region = Core.atlas.find(this.name);
         this.turretcell = Core.atlas.find("ares-gaussguncell");
+        this.track = Core.atlas.find("ares-gausstank-track");
     },
     init(){
         this.super$init();
@@ -66,11 +68,11 @@ const tank = extend(UnitType, "gausstank",{
     },
     drawWeapons(unit){
         this.super$drawWeapons(unit);
-        Draw.z(Layer.groundUnit+1);
         let mrotation = unit.mounts[0].rotation;
         let recoil = -((unit.mounts[0].reload) / tankgun.reload * tankgun.recoil);
         this.applyColor(unit);
         Draw.color(this.cellColor(unit));
+        Draw.z(Layer.groundUnit+1);
         Draw.rect(
             this.turretcell,
             unit.x + Angles.trnsx(unit.rotation-90,tankgun.x,tankgun.y) + Angles.trnsx(mrotation + unit.rotation-90,0,recoil),
@@ -96,10 +98,91 @@ const tank = extend(UnitType, "gausstank",{
     mechSideSway: 0,
     mechStride: 0
 });
+
+
+var paddlex = 12;
+var paddlenum = 8; //per each side, one paddle = 5 length
+var paddlespan = 25;
+var paddlestart = 14; // positive is back neg is front, start at this coordinate and move to front
+var spacing = paddlespan/(paddlenum-1);
+
+var unitsMap = new Map();
 //unit type (mech, sea, fly go here)
 tank.constructor = () => extend(MechUnit,{
     classId: () => tank.classId,
     trackmove: [0,0],
+    lastpos: {},
+    lastrot: [0,0],
+    changepos: new Vec2(0,0),
+    draw(){
+        this.super$draw();
+        if(!unitsMap.has(this.id)){
+            this.lastpos = [new Vec2(this.x,this.y),new Vec2(this.x,this.y)];
+            unitsMap.set(this.id,1);
+        }
+        let r = this.rotation-90; 
+
+        this.lastpos[0] = new Vec2(this.x,this.y);
+        this.changepos = dpos(this.lastpos[1], this.lastpos[0], Time.delta);
+        this.lastpos[1] = new Vec2(this.x,this.y);//will be past position becuase only deteced when loop around
+        
+        this.lastrot[0] = r;
+        this.changerot = angleDifference(this.lastrot[0],this.lastrot[1])/Time.delta;
+        this.lastrot[1] = r;
+
+        //main movement
+        Draw.z(Layer.groundUnit-1);
+        for(let j = -1; j <= 1; j+=2){
+            let k = Math.max(j,0);
+            //if(isNaN(this.changerot)) print("true");
+            //this.trackmove[k] += 1;
+            this.trackmove[k] += Math.sin(toRad(r)-Math.atan2(this.changepos.y,this.changepos.x))*Vec2Len(this.changepos) + toRad(j*this.changerot)*paddlex*2;
+            //if(!(isNaN(r)||isNaN(this.changepos.y)||isNaN(this.changepos.x))){ print(isNaN(r)+" "+isNaN(this.changepos.y)+" "+isNaN(this.changepos.x));}
+            
+            var center = new Vec2(
+                j*paddlex,
+                -(paddlestart - paddlespan - spacing)
+            );
+            Draw.rect(tank.track,
+                this.x + Angles.trnsx(r,center.x, center.y),
+                this.y + Angles.trnsy(r,center.x, center.y),
+                r
+            );
+
+            center = new Vec2(
+                j*paddlex,
+                -(paddlestart)
+            );
+            Draw.rect(tank.track,
+                this.x + Angles.trnsx(r,center.x, center.y),
+                this.y + Angles.trnsy(r,center.x, center.y),
+                r
+            );
+            
+            if(this.trackmove[k] > spacing){
+                this.trackmove[k] -= spacing;
+                //print(this.trackmove[0]);
+            }
+            else if(this.trackmove[k] < 0){
+                this.trackmove[k] += spacing;
+            }
+
+            for(let i = 0; i < paddlenum; i++){
+                let pos = new Vec2(
+                    j*paddlex,
+                    spacing*i - paddlestart + this.trackmove[k]
+                );
+                // a.paddle, this.paddle will not work
+                //the ones on the end flickers for some reason
+                Draw.rect(tank.track,
+                    this.x + Angles.trnsx(r,pos.x, pos.y),
+                    this.y + Angles.trnsy(r,pos.x, pos.y),
+                    r
+                );
+            }
+        }
+        Draw.reset();
+    }
 });
 
 refresh(tank);
@@ -113,4 +196,20 @@ function angleDifference(from, to){
     while (difference < -180) difference += 360;
     while (difference > 180) difference -= 360;
     return difference;
+}
+
+function dpos(ip,fp,t){
+    return new Vec2((fp.x-ip.x)/t,(fp.y-ip.y)/t);
+}
+
+function Vec2Len(v){
+    return Math.sqrt(Math.pow(v.x,2)+Math.pow(v.y,2));
+}
+
+function toRad(angle){
+    return (angle * Math.PI/180);
+}
+
+function toDeg(angle){
+    return (angle * 180/Math.PI);
 }

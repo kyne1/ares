@@ -26,6 +26,7 @@ var paddlex = 34;
 var paddlenum = 5; //per each side
 var paddlespan = 80;
 var paddlestart = 45; // positive is back neg is front, start at this coordinate and move to front
+var spacing = paddlespan/(paddlenum-1);
 
 //for each pair, on one side (right), then mirror it.
 //back , front
@@ -281,7 +282,6 @@ function getAbility(){
             lastrot[0] = r;
             changerot[0] = angleDifference(lastrot[0],lastrot[1])/Time.delta;
             lastrot[1] = r;
-            var spacing = paddlespan/(paddlenum-1);
 
  
             Draw.z(Layer.flyingUnitLow-1);
@@ -299,6 +299,44 @@ function getAbility(){
                     paddlemove[k] += spacing;
                 }
                 //print(isNaN(paddlemove[k]));
+
+                //rotations movement for paddles
+                var padrot = paddlemove[k]/spacing*90 - 90;
+                var padrotfront = padrot + 90;
+
+                var radius = 12;
+                var center = new Vec2(
+                    paddlex-radius,
+                    paddlestart - spacing/2 - paddlespan
+                );
+                
+                //back paddles
+                let pos = new Vec2(
+                    j*(center.x + radius*Math.cos(toRad(padrot))),
+                    center.y + radius*Math.sin(toRad(padrot)),
+                )
+                Draw.rect(a.paddle,
+                    unit.x + Angles.trnsx(r,pos.x, pos.y),
+                    unit.y + Angles.trnsy(r,pos.x, pos.y),
+                    j*padrot + r
+                )
+                
+                //front paddles
+                center = new Vec2(
+                    paddlex-radius,
+                    paddlestart + spacing/2
+                );
+                pos = new Vec2(
+                    j*(center.x + radius*Math.cos(toRad(padrotfront))),
+                    center.y + radius*Math.sin(toRad(padrotfront)),
+                );
+                Draw.rect(a.paddle,
+                    unit.x + Angles.trnsx(r,pos.x, pos.y),
+                    unit.y + Angles.trnsy(r,pos.x, pos.y),
+                    j*padrotfront + r
+                );
+
+
                 //main movement
                 for(let i = 0; i < paddlenum; i++){
                     let pos = new Vec2(
@@ -312,45 +350,6 @@ function getAbility(){
                         unit.y + Angles.trnsy(r,pos.x, pos.y),
                         r
                     )
-                    var radius = 12;
-                    var center = new Vec2(
-                        paddlex-radius,
-                        paddlestart - spacing/2 - paddlespan
-                    );
-                    
-                    //rotations
-                    var padrot = paddlemove[k]/spacing*90 - 90;
-                    var padrotfront = padrot + 90;
-                    
-                    //back
-                    if(i == 0){
-                        let pos = new Vec2(
-                            j*(center.x + radius*Math.cos(toRad(padrot))),
-                            center.y + radius*Math.sin(toRad(padrot)),
-                        )
-                        Draw.rect(a.paddle,
-                            unit.x + Angles.trnsx(r,pos.x, pos.y),
-                            unit.y + Angles.trnsy(r,pos.x, pos.y),
-                            j*padrot + r
-                        )
-                    }
-
-                    //front
-                    else if(i == paddlenum -1){
-                        let center = new Vec2(
-                            paddlex-radius,
-                            paddlestart + spacing/2
-                        );
-                        let pos = new Vec2(
-                            j*(center.x + radius*Math.cos(toRad(padrotfront))),
-                            center.y + radius*Math.sin(toRad(padrotfront)),
-                        );
-                        Draw.rect(a.paddle,
-                            unit.x + Angles.trnsx(r,pos.x, pos.y),
-                            unit.y + Angles.trnsy(r,pos.x, pos.y),
-                            j*padrotfront + r
-                        );
-                    }
                 }
             }
             
