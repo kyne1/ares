@@ -4,7 +4,6 @@ const trail = require("fx/fixedtrail");
 //@params penmod, armormod are functions, see below.
 module.exports = function getBullet(armormod, penmod){
     const bull = extend(BasicBulletType, {
-
         //only registers units hit
         //entity hitboxc -> can be treated as unit
         hitEntity( b,  entity,  initialHealth){
@@ -100,6 +99,7 @@ function pMod(a){
 //effect
 const ef = new Effect(6, e => {
     for(let i = 0; i < 2; i++){
+        Draw.z()
         Draw.color(i == 0 ? Pal.thoriumPink : Pal.bulletYellow);
         var m = i == 0 ? 1 : 0.5;
   

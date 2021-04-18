@@ -72,8 +72,8 @@ const mainshot = extend(ArtilleryBulletType, {
   speed: 3.2,
   splashDamageRadius: 71,
   splashDamage: 365,
-  //direct damage doesnt work
-  damage: 400,
+  //direct damage doesnt work, only breaks the forccefields
+  damage: 160,
   status: StatusEffects.burning,
   trailEffect: Fx.artilleryTrail,
   shootEffect: Fx.none,

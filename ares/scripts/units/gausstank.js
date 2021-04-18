@@ -28,6 +28,7 @@ tankbullet.shootEffect = tankbullet.smokeEffect = Fx.thoriumShoot;
 tankbullet.lifetime = 24;
 tankbullet.speed = 19;
 tankbullet.damage = 64;
+tankbullet.absorbable = false;
 
 //gun
 const tankgun = extend(Weapon, "gaussgun",{
@@ -42,7 +43,7 @@ const tankgun = extend(Weapon, "gaussgun",{
     rotateSpeed: 2.1,
     mirror: false,
     x: 0,
-    y: 2,
+    y: 2.25,
     reload: 150,
     //xRand: 8,
     shootY: 20,
