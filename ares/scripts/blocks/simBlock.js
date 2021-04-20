@@ -1,15 +1,28 @@
 //natvie array dont work
 //java arraylist dont work
-var blockList = Array();
+var blockList = new Map();
 var locName = "sim block"
 
 
 const simBlock = extend(Wall, "simblock", {
+    load(){
+        this.super$load()
+        this.region = Core.atlas.find("ares-simblock");
+    },
+    icons(){
+        return [
+          this.region
+        ];
+    },
+    hasShadow: false,
     size: 1,
     localizedName: locName,
     description: "simulation block for a CA controller",
     destructible: true,
     health: 10,
+    rebuildable: false,
+    breakable: true,
+    solid: true,
 
 });
 
@@ -21,13 +34,17 @@ simBlock.buildType = ent => {
     //variable go here
     ent = extend(Wall.WallBuild, simBlock, {
         init(tile,  team,  shouldAdd,  rotation){
-            blockList.push(this.super$init(tile,  team,  shouldAdd,  rotation));
+            let position = tile.x+","+tile.y;
+            //print(position);
+            blockList.set(position, this.super$init(tile,  team,  shouldAdd,  rotation));
+            //print(this.tile.x);
             //this.kill();
         },
         //not normally used
         killed(){
             //find and remove self
-            blockList.splice(blockList.indexOf(block => block == this),1);
+            let position = this.tile.x + "," + this.tile.y;
+            blockList.delete(position);
             this.super$killed();
         },
     });
@@ -42,7 +59,8 @@ Events.on(BlockBuildEndEvent, e => {
         e.tile.build.cblock == simBlock
         )
     {
-        blockList.splice(blockList.indexOf(block => block == this),1);
+        let position = e.tile.x + "," + e.tile.y;
+        blockList.delete(position);
     }
 });
 

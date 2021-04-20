@@ -9,6 +9,17 @@ var timer = 0;
 
 
 const controller = extend(Wall, "controller", {
+    load(){
+        this.super$load()
+        this.region = Core.atlas.find("ares-controller");
+    },
+    icons(){
+        this.super$icons();
+        return [
+          this.region
+        ];
+    },
+    replaceable: false,
     size: 1,
     update: true,
     localizedName: "GOL controller",
@@ -43,20 +54,21 @@ controller.buildType = ent => {
             table.button(Icon.refresh, Styles.clearTransi, ()=>{
                 paused = true;
                 simUpdate();
+                //timer = 5;
                 table.clearChildren();
                 this.buildConfiguration(table);
             }).size(40);
 
             //clear button
             table.button(Icon.cancel, Styles.clearTransi, () => {
-                for(let i = 0; i < blockList.length; i++){
-                    blockList[i].tile.remove();
-                }
-                blockList.splice(0,blockList.length);
+                blockList.forEach(function(value,key,map){
+                    value.tile.remove();
+                });
+                blockList.clear();
             }).size(40);
 
             //copy and translate from sharustry
-            let slide = new Slider(0, 1, 0.01, false);
+            let slide = new Slider(0.1, 1, 0.01, false);
             slide.setValue(updateSpeed);
             slide.moved(i => updateSpeed = i);
             table.add(slide).width(controller.size * 3 - 20).padTop(4);
@@ -64,57 +76,70 @@ controller.buildType = ent => {
         update(){
             this.super$update();
             //print(blockList.length);
-            if(!paused){
-                timer += updateSpeed*Time.delta;
-                if(timer > 5){
-                    timer = 0;
-                    simUpdate();
-                }
-            }
         },
     });
     return ent;
 }
 
+/*Timer.schedule(e => {
+    print(Math.random());
+}, 0, 0.1/updateSpeed);*/
+Events.run(Trigger.update, () => {
+    //print("h");
+    if(!paused){
+        timer += updateSpeed*Time.delta;
+        if(timer > 5){
+            timer = 0;
+            simUpdate();
+        }
+    }
+});
 function simUpdate(){
     // blocklist index
     let killList = Array();
     //cache checked points as well as storing whether has a block or not at that point
-    //<key, bool> pairing
-    let cacheMap = new Map();
-    for(let i = 0; i < blockList.length; i++){
+
+    //empty nearby
+    let emptyMap = new Map();
+    blockList.forEach(function(value,key,map){
         let c = 0; //counting
-        let block = blockList[i];
+        let s = key.split(',');
+        //print(key);
+        let x = parseInt(s[0]);
+        let y = parseInt(s[1]);
         for(let j = 0; j < 8; j++){
-            let x = rot8x(j);
-            let y = rot8y(j);
-            x += World.toTile(block.x);
-            y += World.toTile(block.y);
-            let a = x+","+y;
-            if(cacheMap.has(a)){
+            let x1 = x + rot8x(j);
+            let y1 = y + rot8y(j);
+            let a = x1+","+y1;
+            //print(a);
+            if(blockList.has(a)){
                 //print("debug");
-                if(cacheMap.get(a)) c++;
+                c++;
             }
-            else{
-                let bool = Vars.world.tile(x,y).block() == simBlock;
-                cacheMap.set(a,bool);
-                //if(bool)print(cacheMap.has(a));
-                if(bool)c++;
-                //print(bool);
+            if(!emptyMap.has(a)){
+                //print(a);
+                //print(Vars.world.tile(x1,y1).block()==Blocks.air);
+                emptyMap.set(a,Vars.world.tile(x1,y1).block()==Blocks.air);
+                //print(Vars.world.tile(x1,y1).block()==Blocks.air);
+                //print(Vars.world.tile(x,y).block());
+                //print(Vars.world.tile(x,y));
             }
             //print(Vars.world.tile(x, y).block());
         }
         if(c < 2 || c > 3){
-            killList.push(i);
+            killList.push(x+","+y);
         }
-    }
+    });
+    //print(emptyMap.size);
+    //print(blockList.size);
     //find empty space, falses
-    cacheMap.forEach(function(value, key, map){
+    emptyMap.forEach(function(value, key, map){
         let s = key.split(',');
         let x = parseInt(s[0]);
         let y = parseInt(s[1]);
         //print(Vars.world.tile(x,y).block()==Blocks.air);
-        if(value == false && Vars.world.tile(x,y).block()==Blocks.air){
+        //print(value);
+        if(value){
             let c = 0;
             //281 231
             for(let i = 0; i < 8; i++){
@@ -123,7 +148,10 @@ function simUpdate(){
                 //print(x + "," + y);
                 //print(map.get(key));
                 let a = x1+","+y1;
-                if(map.get(a)==true) c++;
+                if(map.has(a) && !map.get(a)){
+                    //print(a);
+                    c++
+                };
                 //print(map.has(a));
             }
             //print(c);
@@ -132,8 +160,8 @@ function simUpdate(){
     });
     //remove blocks top-down
     for(let i = killList.length - 1; i >= 0; i--){
-        blockList[killList[i]].tile.remove();
-        blockList.splice(killList[i],1);
+        blockList.get(killList[i]).tile.remove();
+        blockList.delete(killList[i]);
     }
 }
 
