@@ -5,6 +5,7 @@ var simBlock = sim.block;
 //global variable for simulation
 var updateSpeed = 0;
 var paused = true;
+var timer = 0;
 
 
 const controller = extend(Wall, "controller", {
@@ -25,11 +26,9 @@ controller.setupRequirements(Category.logic, ItemStack.with(
 
 controller.buildType = ent => {
     //variable go here
-    pauseIcon: Icon.pause,
+    var pauseIcon = Icon.pause;
     ent = extend(Wall.WallBuild, controller, {
         buildConfiguration(table){
-
-
             if(paused){
                 this.pauseIcon = Icon.play;
             }
@@ -65,6 +64,13 @@ controller.buildType = ent => {
         update(){
             this.super$update();
             //print(blockList.length);
+            if(!paused){
+                timer += updateSpeed*Time.delta;
+                if(timer > 5){
+                    timer = 0;
+                    simUpdate();
+                }
+            }
         },
     });
     return ent;
@@ -86,7 +92,7 @@ function simUpdate(){
             y += World.toTile(block.y);
             let a = x+","+y;
             if(cacheMap.has(a)){
-                print("debug");
+                //print("debug");
                 if(cacheMap.get(a)) c++;
             }
             else{
@@ -104,11 +110,12 @@ function simUpdate(){
     }
     //find empty space, falses
     cacheMap.forEach(function(value, key, map){
-        if(value == false){
+        let s = key.split(',');
+        let x = parseInt(s[0]);
+        let y = parseInt(s[1]);
+        //print(Vars.world.tile(x,y).block()==Blocks.air);
+        if(value == false && Vars.world.tile(x,y).block()==Blocks.air){
             let c = 0;
-            let s = key.split(',');
-            let x = parseInt(s[0]);
-            let y = parseInt(s[1]);
             //281 231
             for(let i = 0; i < 8; i++){
                 let x1 = x+rot8x(i);
@@ -119,7 +126,7 @@ function simUpdate(){
                 if(map.get(a)==true) c++;
                 //print(map.has(a));
             }
-            print(c);
+            //print(c);
             if(c == 3) Vars.world.tile(x, y).setBlock(simBlock, Team.sharded);
         }
     });
