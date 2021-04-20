@@ -7,11 +7,11 @@ const apbullet = require("bullets/armorpiercing");
 function aMod(a){
     //overpen
     if(a<3){
-        return 0.3 + 0.1 * a;
+        return 0.2 + 0.1 * a;
     }
     //normal armor mod
     else{
-        return -(a-2.5)*(a-25)/20;
+        return -(a-2.5)*(a-25)/20;//goes up to ~7x
     }
 }
 function pMod(a){
@@ -27,7 +27,7 @@ tankbullet.hitEffect = Fx.hitBulletSmall;
 tankbullet.shootEffect = tankbullet.smokeEffect = Fx.thoriumShoot;
 tankbullet.lifetime = 24;
 tankbullet.speed = 19;
-tankbullet.damage = 64;
+tankbullet.damage = 135;
 tankbullet.absorbable = false;
 
 //gun
@@ -44,7 +44,7 @@ const tankgun = extend(Weapon, "gaussgun",{
     mirror: false,
     x: 0,
     y: 2.25,
-    reload: 150,
+    reload: 145,
     //xRand: 8,
     shootY: 20,
     shootCone: 3,
@@ -54,7 +54,7 @@ const tankgun = extend(Weapon, "gaussgun",{
     //restitution: 0.3,
     shots: 1,
     shootSound: Sounds.shotgun,
-    cooldownTime: 180
+    cooldownTime: 150
 });
 
 //unit
@@ -85,17 +85,17 @@ const tank = extend(UnitType, "gausstank",{
         );
         Draw.reset();
     },
-    description: "placeholder",
-    health: 560,
+    description: "Armoured tracked vehicle with a railgun that fires thorium tipped Armor Piercing shells. Will overpenetrate light armored targets. Try to keep distance.",
+    health: 2275,
     //type: flying,
-    speed: 0.78,
-    accel: 0.06,
-    drag: 0.05,
+    speed: 0.74,
+    accel: 0.03,
+    drag: 0.028,
     hitSize: 24,
-    armor: 11,
+    armor: 16,
     rotateShooting: false,
-    rotateSpeed: 1.4,
-    research: UnitTypes.dagger,
+    rotateSpeed: 1.55,
+    research: UnitTypes.fortress,
     range: 160,
     //get rid of leg animation
     mechFrontSway: 0,

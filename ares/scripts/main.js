@@ -6,6 +6,8 @@ require('abilities/shootAbility');
 require('abilities/customUnitSpawn');
 
 require('blocks/shotgunblock');
+require('blocks/GOLcontroller');
+require('blocks/simBlock');
 
 require('bullets/armorpiercing');
 
