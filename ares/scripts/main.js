@@ -1,6 +1,7 @@
 require('units/ares');
 require('units/ai/ares-ai');
 require('units/gausstank');
+require('units/grouper');
 
 require('abilities/shootAbility');
 require('abilities/customUnitSpawn');

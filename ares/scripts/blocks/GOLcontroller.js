@@ -19,6 +19,7 @@ const controller = extend(Wall, "controller", {
           this.region
         ];
     },
+    buildCostMultipler: 1.0,
     replaceable: false,
     size: 1,
     update: true,
@@ -29,16 +30,19 @@ const controller = extend(Wall, "controller", {
 });
 
 controller.setupRequirements(Category.logic, ItemStack.with(
-    Items.silicon, 125,
-    Items.titanium, 180,
-    Items.copper, 210,
-    Items.lead, 175
-))
+    Items.silicon, 53,
+    Items.titanium, 25,
+    Items.copper, 110,
+    Items.lead, 75
+));
 
 controller.buildType = ent => {
     //variable go here
     var pauseIcon = Icon.pause;
     ent = extend(Wall.WallBuild, controller, {
+        init(tile,  team,  shouldAdd,  rotation){
+            return this.super$init(tile,  team,  shouldAdd,  rotation);
+        },
         buildConfiguration(table){
             if(paused){
                 this.pauseIcon = Icon.play;
@@ -94,6 +98,8 @@ Events.run(Trigger.update, () => {
         }
     }
 });
+
+//update simBlock
 function simUpdate(){
     // blocklist index
     let killList = Array();
@@ -116,6 +122,7 @@ function simUpdate(){
                 //print("debug");
                 c++;
             }
+            //add neighbors to temp map
             if(!emptyMap.has(a)){
                 //print(a);
                 //print(Vars.world.tile(x1,y1).block()==Blocks.air);
@@ -125,6 +132,11 @@ function simUpdate(){
                 //print(Vars.world.tile(x,y));
             }
             //print(Vars.world.tile(x, y).block());
+        }
+        //add self to temp map
+        let a = coordString(x,y);
+        if(!emptyMap.has(a)){
+            emptyMap.set(a,false);
         }
         if(c < 2 || c > 3){
             killList.push(x+","+y);
@@ -149,12 +161,16 @@ function simUpdate(){
                 //print(map.get(key));
                 let a = x1+","+y1;
                 if(map.has(a) && !map.get(a)){
+                    /*if(x == 267 && y == 292){
+                        print(map.has(266+","+292));
+                    }*/
                     //print(a);
                     c++
                 };
                 //print(map.has(a));
             }
             //print(c);
+            
             if(c == 3) Vars.world.tile(x, y).setBlock(simBlock, Team.sharded);
         }
     });
@@ -181,4 +197,8 @@ function rot8y(i){
     else if(i > 2 && i < 6) y = -1;
     else y = 1;
     return y;
+}
+
+function coordString(x,y){
+    return x+","+y;
 }

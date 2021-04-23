@@ -23,11 +23,11 @@ const simBlock = extend(Wall, "simblock", {
     rebuildable: false,
     breakable: true,
     solid: true,
-
+    buildCostMultiplier: 1,
 });
 
 simBlock.setupRequirements(Category.logic, ItemStack.with(
-    Items.copper, 1
+    Items.silicon, 2
 ))
 
 simBlock.buildType = ent => {
@@ -36,9 +36,11 @@ simBlock.buildType = ent => {
         init(tile,  team,  shouldAdd,  rotation){
             let position = tile.x+","+tile.y;
             //print(position);
-            blockList.set(position, this.super$init(tile,  team,  shouldAdd,  rotation));
+            this.super$init(tile,  team,  shouldAdd,  rotation);
+            blockList.set(position, this);
             //print(this.tile.x);
             //this.kill();
+            return this;
         },
         //not normally used
         killed(){
