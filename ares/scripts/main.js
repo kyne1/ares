@@ -1,7 +1,15 @@
-require('units/ares');
+let units = [
+  "ares",
+  "gausstank",
+  "grouper",
+  "warper"
+];
+
+for(let i = 0; i < units.length; i++){
+  require("units/"+units[i]);
+}
+
 require('units/ai/ares-ai');
-require('units/gausstank');
-require('units/grouper');
 
 require('abilities/shootAbility');
 require('abilities/customUnitSpawn');

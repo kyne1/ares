@@ -1,7 +1,7 @@
 //this is more like a addon to ares unit than an ability
 const refresh = require("libs/refresh");
 const a = require('units/ares');
-refresh(a);
+
 //weapon variables
 var reload = 10;
 var spread = 12;
@@ -20,6 +20,7 @@ var xradaroffset = 30;
 
 //deafen it
 var shootSound = loadSound("secondaryshoot");
+//const secondaries = Core.atlas.find("ares-secondaries");
 
 //paddle vars;
 var paddlex = 34;
@@ -365,3 +366,4 @@ function getAbility(){
 //adds this to all units of 'a' so no easy way out.
 a.abilities.add(getAbility());
 
+refresh(a);

@@ -1,5 +1,7 @@
 const refresh = require("libs/refresh");
 
+//const searchInterval = 75;
+
 function sprite(name){
     return Core.atlas.find(name);
 }
@@ -16,7 +18,6 @@ function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     Draw.z(Layer.flyingUnitLow+0.5);
     Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
 }
-
 //var inc = 0;
 
 const grouper = extend(UnitType, "grouper",{
@@ -55,26 +56,20 @@ grouper.constructor = () => extend(UnitEntity,{
     groupsize: 0,
     maxh: 0,
     sumh: 0,
+    searchTimer: 0,
     update(){
         this.super$update();
         //print(this.isShooting); //will work without weapons
-        let mount = this.mounts[0];
-        if(mount.shoot && mount.reload == sapgun.reload){
-            mount.reload -= Math.random()*(sapgun.reload-10)
-        }
         //print(this.units); //this.units -> formation members
         //print(this.isCommanding()) //isCommanding()
         //print(mount.reload);
         //randomize firing interval
+        let mount = this.mounts[0];
+        if(mount.shoot && mount.reload == sapgun.reload){
+            mount.reload -= Math.random()*(sapgun.reload-10);
+        }
         if(this.isCommanding()){
             //kill everyone if pool is near zero
-            if(this.sumh <= 1){
-                this.controlling.forEach(u => {
-                    u.kill();
-                });
-                this.kill();
-                //this.formation = null;
-            }
             let helth = 0;
             this.controlling.forEach(u => {
                 //this.maxh += u.maxHealth;
@@ -83,12 +78,30 @@ grouper.constructor = () => extend(UnitEntity,{
             });
             helth += this.health;
             this.sumh = helth;
+
+            if(this.sumh <= 1){
+                this.controlling.forEach(u => {
+                    u.kill();
+                });
+                this.kill();
+                //this.formation = null;
+            }
+
             let percentage = this.sumh/this.maxh;
             this.controlling.forEach(u => {
                 u.health = u.type.health*percentage;
             });
             this.health = this.type.health*percentage;
         }
+
+        //autogrouping for AI
+        /*if(!this.isPlayer() && this.groupsize < 5){
+            if(this.searchTimer >= searchInterval){
+                this.searchTimer = 0;
+                this.commandNearby(new CircleFormation());
+            }
+            else this.searchTimer += Time.delta;
+        }*/
         //print(this.maxHealth+","+this.health);
     },
     clearCommand(){
@@ -123,10 +136,43 @@ grouper.constructor = () => extend(UnitEntity,{
                 drawLaser(this.team,
                     this.x,this.y,
                     u.x,u.y,
-                    14,14);
+                    this.hitSize/2,u.hitSize/2);
             });
         }
-    }
+    },
+    /*commandNearby(pattern, include){
+        if(this.leader != null && this.leader.isAI()) return;
+        //importing variable from unit
+        let x = this.x;
+        let y = this.y;
+        let rotation = this.rotation;
+        let team = this.team;
+        let type = this.type;
+        let hitSize = this.hitSize;
+
+        let formation = new Formation(new Vec3(x, y, rotation), pattern);
+        formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
+
+        this.units.clear();
+
+        Units.nearby(team, x, y, 150, u => {
+            if(u != this && u.type.flying == type.flying && u.hitSize <= hitSize * 1.1){
+                //print(u.isAI());
+                if(u != this.leader && (u.leader == null || u.leader != this.leader)){
+                    //print("yes");
+                    this.units.add(u);
+                } 
+            }
+        });
+
+        if(this.units.isEmpty()) return;
+
+        //sort by hitbox size, then by distance
+        this.units.sort(Structs.comps(Structs.comparingFloat(u => -u.hitSize), Structs.comparingFloat(u => u.dst2(this))));
+        this.units.truncate(type.commandLimit);
+
+        this.command(formation, this.units);
+    },*/
 });
 
 const sapbullet = extend(SapBulletType,{
@@ -153,6 +199,8 @@ const sapgun = extend(Weapon, "sapgun",{
 });
 
 grouper.weapons.add(sapgun);
+
+grouper.defaultController = () => extend(BuilderAI,{});
 
 refresh(grouper);
 
