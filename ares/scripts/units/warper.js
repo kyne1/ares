@@ -9,28 +9,42 @@ function sprite(name){
 const orbs = 3;
 const laser = sprite("laser");
 const laserEnd = sprite("laser-end");
-const inaccuracy = 3;
+const inaccuracy = 2;
 const rotateSpeed = 0.9;
-const orbReload = 86;
+const orbReload = 96;
+const animStart = 0.55; //when does orb start growing in size;
+const orbSize = 3.6;
 
 function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     let angle1 = Angles.angle(x1, y1, x2, y2);
     let vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1);
     let len1 = size1 / 2 - 1.5, len2 = size2 / 2 - 1.5;
     //print(Drawf);
-    Draw.color(Color.valueOf("#dfcbfe"), 0.8);
-    Draw.z(Layer.flyingUnitLow+0.5);
+    Draw.color(Color.valueOf("#bf8bce"), 0.8);
     Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
 }
 
 function drawOrb(x, y, size, opacity){
     //Draw.reset();
-    Drawf.shadow(x, y, size*2);
     //Drawf.light(x, y, size*3, Color.valueOf("#dfcfef"), 1);
-    Draw.color(Color.valueOf("#dfcfef"), 0.7*opacity)
+    Draw.z(Layer.bullet);
+    Draw.color(Color.valueOf("#dfcfef"), 0.2*opacity)
+    Fill.circle(x, y, size*1.15);
+    Draw.color(Color.valueOf("#dfcfef"), 0.3*opacity)
     Fill.circle(x, y, size);
+    Draw.color(Color.valueOf("#dfcfef"), 0.7*opacity)
+    Fill.circle(x, y, size*0.8);
     Draw.color(Color.valueOf("#feeeef"), 0.96*opacity);
-    Fill.circle(x, y, size*0.67);
+    Fill.circle(x, y, size*0.5);
+}
+
+function scaleOrb(x,y,sizei,sizef,percent){
+    //print(sizei+scale*(sizef-sizei));
+    drawOrb(x,y,sizei+fin(percent)*(sizef-sizei),1);
+}
+
+function fin(percent){
+    return 1 - Math.pow(2,-Math.min(percent,1)*6); //1-2^(-6x)
 }
 //returns an angle
 
@@ -70,7 +84,7 @@ const warper = extend(UnitType, "warper",{
     research: UnitTypes.horizon,
     range: 180,
     commandLimit: 9,
-    lowAltitude: true,
+    lowAltitude: false,
     buildSpeed: 1.2,
     mineTier: 3,
     mineSpeed: 8,
@@ -199,10 +213,18 @@ warper.constructor = () => extend(UnitEntity,{
             });
         }
         try{
+
+            if(this.orbtimer >= orbReload * animStart && this.orbready < orbs && this.orbtimer <= orbReload){
+                let percent = (this.orbtimer - orbReload * animStart)/(orbReload*(1-animStart));
+                let thisx = this.orbpos[this.orbready].x + this.x;
+                let thisy = this.orbpos[this.orbready].y + this.y;
+                scaleOrb(thisx,thisy,0,orbSize,percent);
+            }
+
             for(let i = 0; i < this.orbready; i++){
                 let thisx = this.orbpos[i].x + this.x;
                 let thisy = this.orbpos[i].y + this.y;
-                drawOrb(thisx,thisy,3.6,1);
+                drawOrb(thisx,thisy,orbSize,1);
             }
         }   
         catch(e){
@@ -212,7 +234,7 @@ warper.constructor = () => extend(UnitEntity,{
 });
 
 const warperbullet = extend(LightningBulletType,{
-    damage: 40,
+    damage: 34,
     shootEffect: Fx.none,
     lightningLength: 7,
     lightningLengthRand: 3,
@@ -236,20 +258,20 @@ const warperbullet2 = extend(BasicBulletType,{
 });
 
 const orbBullet = extend(BasicBulletType,{
-    damage: 35,
+    damage: 30,
     splashDamageRadius: 35,
     splashDamage: 12,
     shootEffect: Fx.none,
     despawnEffect: Fx.redgeneratespark,
     hitEffect: Fx.redgeneratespark,
-    lifetime: 85,
-    speed: 3.5,
-    homingPower: 0.07,
-    homingRange: 130,
+    lifetime: 80,
+    speed: 3.8,
+    homingPower: 0.08,
+    homingRange: 70,
     fragBullets: 2,
     fragBullet: warperbullet,
     draw(b){
-        drawOrb(b.x,b.y,3.6,1);
+        drawOrb(b.x,b.y,orbSize,1);
     }
 });
 
@@ -303,7 +325,7 @@ warper.defaultController = () => extend(BuilderAI,{});
 
 const shield = new JavaAdapter(ShieldRegenFieldAbility, {}, 15, 90, 60*3.5, 50);
 
-const heal = new JavaAdapter(RepairFieldAbility, {}, 25, 60*7, 50);
+const heal = new JavaAdapter(RepairFieldAbility, {}, 25, 60*8, 50);
 
 warper.abilities.add(shield);
 
