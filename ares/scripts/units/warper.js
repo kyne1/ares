@@ -1,4 +1,5 @@
 const refresh = require("libs/refresh");
+const fname = require("dir");
 
 //const searchInterval = 75;
 
@@ -63,7 +64,7 @@ function angleTo(xf,yf,xi,yi){
 const warper = extend(UnitType, "warper",{
     load(){
         this.super$load();
-        this.region = sprite("ares-warper");
+        this.region = sprite(fname+"-warper");
     },
     init(){
         this.super$init();
@@ -274,28 +275,6 @@ const orbBullet = extend(BasicBulletType,{
         drawOrb(b.x,b.y,orbSize,1);
     }
 });
-
-
-/*
-for(let i = 0; i < orbs; i++){
-    let wpn = extend(Weapon, "magicgun",{
-        rotate: true,
-        rotateSpeed: 360,
-        mirror: false,
-        x: 0,
-        y: 0,
-        reload: 5,
-        //xRand: 8,
-        shootY: 0,
-        shootX: 0,
-        recoil: 0,
-        inaccuracy: 1.4,
-        shots: 1,
-        shootSound: Sounds.pew,
-        bullet: warperbullet,
-    });
-    warper.weapons.add(wpn);
-}*/
 
 const blankshot = extend(BasicBulletType,{
     lifetime: 0,

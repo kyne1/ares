@@ -2,7 +2,8 @@ let units = [
   "ares",
   "gausstank",
   "grouper",
-  "warper"
+  "warper",
+  "swarm",
 ];
 
 for(let i = 0; i < units.length; i++){
@@ -22,5 +23,6 @@ require('bullets/armorpiercing');
 
 require('libs/refresh');
 require('fx/fixedtrail');
+require('dir');
 //require('effects.js');
 //require('wcompchange');

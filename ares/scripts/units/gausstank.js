@@ -1,6 +1,6 @@
 const refresh = require("libs/refresh");
 const apbullet = require("bullets/armorpiercing");
-
+const fname = require("dir");
 
 
 //modifiers
@@ -35,9 +35,9 @@ const tankgun = extend(Weapon, "gaussgun",{
     bullet: tankbullet,
     load(){
         this.super$load();
-        this.region = Core.atlas.find("ares-" + this.name);
-        this.outlineRegion = Core.atlas.find("ares-"+ this.name + "-outline");
-        this.heatRegion = Core.atlas.find("ares-"+ this.name + "-heat");
+        this.region = Core.atlas.find(fname + "-" + this.name);
+        this.outlineRegion = Core.atlas.find(fname + "-"+ this.name + "-outline");
+        this.heatRegion = Core.atlas.find(fname+ "-"+ this.name + "-heat");
     },
     rotate: true,
     rotateSpeed: 2.1,
@@ -63,8 +63,8 @@ const tank = extend(UnitType, "gausstank",{
     load(){
         this.super$load();
         this.region = Core.atlas.find(this.name);
-        this.turretcell = Core.atlas.find("ares-gaussgun-cell");
-        this.track = Core.atlas.find("ares-gausstank-track");
+        this.turretcell = Core.atlas.find(fname+"-gaussgun-cell");
+        this.track = Core.atlas.find(fname+"-gausstank-track");
     },
     init(){
         this.super$init();

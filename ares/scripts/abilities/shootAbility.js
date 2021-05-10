@@ -1,6 +1,7 @@
 //this is more like a addon to ares unit than an ability
 const refresh = require("libs/refresh");
 const a = require('units/ares');
+const fname = require('dir');
 
 //weapon variables
 var reload = 10;
@@ -251,15 +252,20 @@ function getAbility(){
             var changerot = unitsMap.get(unit.id+"changerot");
             //unit rotation instead of mount
             var r = unit.rotation-90; 
-            for(let j = 0; j < 2; j++){
-                for(let i = 0; i < rows; i++){
-                    var iter = i+rows*j;
-                    Draw.rect(a.secondaries,
-                        unit.x + Angles.trnsx(r, 50*j - 25, yspan/(rows-1)*i - ystart),
-                        unit.y + Angles.trnsy(r, 50*j - 25, yspan/(rows-1)*i - ystart),
-                        mrotation[iter] - 90
-                    )
+            try{
+                for(let j = 0; j < 2; j++){
+                    for(let i = 0; i < rows; i++){
+                        var iter = i+rows*j;
+                        Draw.rect(a.secondaries,
+                            unit.x + Angles.trnsx(r, 50*j - 25, yspan/(rows-1)*i - ystart),
+                            unit.y + Angles.trnsy(r, 50*j - 25, yspan/(rows-1)*i - ystart),
+                            mrotation[iter] - 90
+                        )
+                    }
                 }
+            }
+            catch(e){
+                //java sucks
             }
 
             //moved from ares's draw() because bug when loaded up

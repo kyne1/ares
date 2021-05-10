@@ -1,5 +1,6 @@
 const refresh = require("libs/refresh");
 const spawn = require('abilities/customUnitSpawn');
+const fname = require('dir');
 
 var sides = ["L","M","R"];
 
@@ -128,13 +129,13 @@ function getUnit(){
     load() {
       this.super$load();
       this.region = Core.atlas.find(this.name);
-      this.tbase = Core.atlas.find("ares-turret1base");
-      this.secondaries = Core.atlas.find("ares-secondaries");
-      this.paddle = Core.atlas.find("ares-ares-paddle");
+      this.tbase = Core.atlas.find(fname+"-turret1base");
+      this.secondaries = Core.atlas.find(fname+"-secondaries");
+      this.paddle = Core.atlas.find(fname+"-ares-paddle");
       this.barrel = {}; //LMR
       for(let i = 0; i < 3; i++){
         let tempsides = sides[i];
-        this.barrel[i] = Core.atlas.find("ares-gun" + tempsides);
+        this.barrel[i] = Core.atlas.find(fname+"-gun" + tempsides);
       }
     },
     init(){
