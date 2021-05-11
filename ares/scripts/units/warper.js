@@ -206,6 +206,7 @@ warper.constructor = () => extend(UnitEntity,{
     draw(){
         this.super$draw();
         if(this.isCommanding()){
+            Draw.z(Layer.flyingUnit-1);
             this.controlling.forEach(u=>{
                 drawLaser(this.team,
                     this.x,this.y,
@@ -302,7 +303,7 @@ warper.weapons.add(fakegun);
 
 warper.defaultController = () => extend(BuilderAI,{});
 
-const shield = new JavaAdapter(ShieldRegenFieldAbility, {}, 15, 90, 60*3.5, 50);
+const shield = new JavaAdapter(ShieldRegenFieldAbility, {}, 15, 90, 60*4.5, 50);
 
 const heal = new JavaAdapter(RepairFieldAbility, {}, 25, 60*8, 50);
 

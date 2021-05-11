@@ -40,29 +40,6 @@ module.exports = function getBullet(armormod, penmod){
             //print(b.x+" "+b.y+" "+b.rotation());
             ef.at(b.x, b.y, b.rotation());
         },
-        /*bcreate(  owner,  team,  x,  y,  angle,  damage,  velocityScl,  lifetimeScl,  data , b){
-            let bullet = Bullet.create();
-            bullet.type = this;
-            bullet.owner = owner;
-            bullet.team = team;
-            bullet.time = 0;
-            bullet.vel.trns(angle, this.speed * velocityScl);
-            if(this.backMove){
-                bullet.set(x - bullet.vel.x * Time.delta, y - bullet.vel.y * Time.delta);
-            }else{
-                bullet.set(x, y);
-            }
-            //bullet.lifetime = this.lifetime * lifetimeScl; //modified
-            bullet.lifetime = this.lifetime * lifetimeScl;
-            bullet.data = data;
-            bullet.drag = this.drag;
-            bullet.hitSize = this.hitSize;
-            bullet.damage = (damage < 0 ? this.damage : damage) * bullet.damageMultiplier();
-            bullet.add();
-
-            if(this.keepVelocity && owner instanceof Velc) bullet.vel.add(owner.vel.x, owner.vel.y);
-            return bullet;
-        },*/
         width: 5,
         height: 16,
         shrinkY: 0,

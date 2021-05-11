@@ -1,5 +1,7 @@
 const refresh = require("libs/refresh");
 const fname = require("dir");
+const sapbomb = require("bullets/sapbomb");
+const comShield = require("abilities/commandShield");
 //const searchInterval = 75;
 
 function sprite(name){
@@ -16,10 +18,6 @@ function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     //print(Drawf);
     Draw.color(Color.valueOf("#bf8bce"), 0.8);
     Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
-}
-
-function fin(percent){
-    return 1 - Math.pow(2,-Math.min(percent,1)*6); //1-2^(-6x)
 }
 //returns an angle
 
@@ -44,25 +42,27 @@ const swarm = extend(UnitType, "swarm",{
         this.super$init();
         this.localizedName = "Swarm";
     },
-    description: "placeholder",
-    health: 70,
-    speed: 4.3,
-    accel: 0.051,
-    drag: 0.05,
+    description: "light bomber",
+    health: 87,
+    speed: 7,
+    accel: 0.0305,
+    drag: 0.03,
+    armor: 1,
     flying: true,
-    hitSize: 5,
+    hitSize: 6,
     engineOffset: 5,
-    engineSize: 1,
-    armor: 0,
-    rotateShooting: true,
+    engineSize: 2.3,
+    rotateShooting: false,
     rotateSpeed: 7,
     research: UnitTypes.flare,
-    range: 120,
+    circleTarget: true,
+    targetAir: false,
+    range: 140,
     commandLimit: 19,
     lowAltitude: false,
+    faceTarget: false,
     mineTier: 1,
     mineSpeed: 0.5,
-    buildSpeed:0.3
 });
 
 swarm.constructor = () => extend(UnitEntity,{
@@ -78,7 +78,7 @@ swarm.constructor = () => extend(UnitEntity,{
             this.controlling.forEach(u => {
                 //this.maxh += u.maxHealth;
                 helth += u.health;
-                //print(helth);
+                //print(u.shield);
             });
             helth += this.health;
             this.sumh = helth;
@@ -105,7 +105,17 @@ swarm.constructor = () => extend(UnitEntity,{
             this.groupsize = 0;
             this.maxh = 0;
             this.sumh = 0;
-            
+            this.controlling.forEach(u => {
+                let has = false;
+                u.abilities.forEach(ab => {
+                    if(ab instanceof ForceFieldAbility){
+                        has = true;
+                    }
+                });
+                if(!has){
+                    u.shield = 0;
+                }
+            });
         }
         this.super$clearCommand();
         //inc++;
@@ -138,27 +148,47 @@ swarm.constructor = () => extend(UnitEntity,{
     },
 });
 
+const bomb = sapbomb();
+bomb.homingPower =  6;
+bomb.homingRange = 70;
+bomb.splashDamage = 14;
+bomb.splashDamageRadius = 16;
+bomb.lifetime = 56;
+bomb.speed = 0;
+bomb.maxSpeed = 1.15;
+bomb.drag = 0.036;
 
-const swarmbullet = extend(BasicBulletType,{
-    damage: 4,
-    lifetime: 36,
-    width: 7,
-    height: 10,
-    speed: 5,
-});
+bomb.frontColor = bomb.backColor = Color.valueOf("bf92f9");
+bomb.width = 9;
+bomb.height = 12;
+bomb.shrinkY = 0.6;
+bomb.shrinkX = 0.4;
+bomb.despawnEffect = Fx.flakExplosion;
+//bomb.color = Color.valueOf("bf92f9");
+
 
 const swarmgun = extend(Weapon, "swarmgun", {
     rotate: false,
-    x:3,
-    y:4,
-    reload: 15,
-    mirror: true,
-    bullet: swarmbullet,
-    inaccuracy: 6,
+    x:0,
+    xRand: 0.7,
+    y:0,
+    reload: 160,
+    mirror: false,
+    bullet: bomb,
+    ignoreRotation:true,
+    shootCone: 180,
+    inaccuracy: 15,
+    shots: 7,
+    shotDelay: 2
 });
 
 swarm.weapons.add(swarmgun);
 
-swarm.defaultController = () => extend(BuilderAI,{});
+swarm.defaultController = () => extend(FlyingAI,{});
+
+//radius regen max cooldown
+const shield = new comShield(15,1,65,50);
+
+swarm.abilities.add(shield);
 
 refresh(swarm);

@@ -15,7 +15,7 @@ function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     let len1 = size1 / 2 - 1.5, len2 = size2 / 2 - 1.5;
     //print(Drawf);
     Draw.color(Color.valueOf("#bf8bce"), 0.8);
-    Draw.z(Layer.flyingUnitLow+0.5);
+    Draw.z(Layer.flyingUnitLow-1);
     Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
 }
 //var inc = 0;

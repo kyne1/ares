@@ -1,28 +1,50 @@
-let units = [
+const units = [
   "ares",
   "gausstank",
   "grouper",
   "warper",
   "swarm",
+  "/ai/ares-ai",
 ];
 
-for(let i = 0; i < units.length; i++){
-  require("units/"+units[i]);
-}
+const abilities = [
+  "shootAbility",
+  "customUnitSpawn",
+  "commandShield",
+];
 
-require('units/ai/ares-ai');
+const blocks = [
+  "shotgunblock",
+  "GOLcontroller",
+  "simBlock",
+];
 
-require('abilities/shootAbility');
-require('abilities/customUnitSpawn');
+const bullets = [
+  "armorpiercing",
+  "sapbomb",
+];
 
-require('blocks/shotgunblock');
-require('blocks/GOLcontroller');
-require('blocks/simBlock');
 
-require('bullets/armorpiercing');
+
+units.forEach(i => {
+  require("units/"+i);
+});
+
+abilities.forEach(i => {
+  require("abilities/"+i);
+});
+
+blocks.forEach(i => {
+  require("blocks/"+i);
+});
+
+bullets.forEach(i => {
+  require("bullets/"+i);
+});
 
 require('libs/refresh');
 require('fx/fixedtrail');
 require('dir');
+
 //require('effects.js');
 //require('wcompchange');
