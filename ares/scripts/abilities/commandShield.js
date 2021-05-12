@@ -5,7 +5,6 @@ module.exports = function make(radius,regen,max,cooldown){
             this.super$load();
         },
         update(unit){
-            this.super$update(unit);
             if(unit.isCommanding()){
                 unit.controlling.forEach(u => {
                     this.super$update(u);
@@ -13,12 +12,15 @@ module.exports = function make(radius,regen,max,cooldown){
             }
         },
         draw(unit){
-            this.super$draw(unit);
             if(unit.isCommanding()){
                 unit.controlling.forEach(u => {
                     this.super$draw(u);
+                    //if(u.type != unit.type) print("not unit");
                 });
             }
+        },
+        localized(){
+            return "Command-Shield";
         }
     }
     ,radius,regen,max,cooldown

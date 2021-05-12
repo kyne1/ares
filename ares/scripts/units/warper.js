@@ -14,7 +14,7 @@ const inaccuracy = 2;
 const rotateSpeed = 0.9;
 const orbReload = 96;
 const animStart = 0.55; //when does orb start growing in size;
-const orbSize = 3.6;
+const orbSize = 4.4;
 
 function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     let angle1 = Angles.angle(x1, y1, x2, y2);
@@ -29,13 +29,13 @@ function drawOrb(x, y, size, opacity){
     //Draw.reset();
     //Drawf.light(x, y, size*3, Color.valueOf("#dfcfef"), 1);
     Draw.z(Layer.bullet);
-    Draw.color(Color.valueOf("#dfcfef"), 0.2*opacity)
+    Draw.color(Color.valueOf("#a751fd"), 0.2*opacity)
     Fill.circle(x, y, size*1.15);
-    Draw.color(Color.valueOf("#dfcfef"), 0.3*opacity)
+    Draw.color(Color.valueOf("#bb7cf9"), 0.3*opacity)
     Fill.circle(x, y, size);
-    Draw.color(Color.valueOf("#dfcfef"), 0.7*opacity)
+    Draw.color(Color.valueOf("#bf8bce"), 0.7*opacity)
     Fill.circle(x, y, size*0.8);
-    Draw.color(Color.valueOf("#feeeef"), 0.96*opacity);
+    Draw.color(Color.valueOf("#e1b9ed"), 0.96*opacity);
     Fill.circle(x, y, size*0.5);
 }
 
@@ -240,6 +240,8 @@ const warperbullet = extend(LightningBulletType,{
     shootEffect: Fx.none,
     lightningLength: 7,
     lightningLengthRand: 3,
+    lightningColor: Color.valueOf("#bf8bce"),
+    hitColor: Color.valueOf("#bf8bce"),
     lightningType: extend(BulletType, {
         lifetime: Fx.lightning.lifetime,
         hitEffect: Fx.none,
@@ -296,16 +298,17 @@ const fakegun = extend(Weapon, "fakegun",{
     reload: 10000,
     recoil: 0,
     mirror: false,
-    bullet: blankshot
+    bullet: blankshot,
+    shootSound: Sounds.none,
 });
 
 warper.weapons.add(fakegun);
 
 warper.defaultController = () => extend(BuilderAI,{});
 
-const shield = new JavaAdapter(ShieldRegenFieldAbility, {}, 15, 90, 60*4.5, 50);
+const shield = new ShieldRegenFieldAbility(15, 90, 60*4.5, 50);
 
-const heal = new JavaAdapter(RepairFieldAbility, {}, 25, 60*8, 50);
+const heal = new RepairFieldAbility(25, 60*8, 50);
 
 warper.abilities.add(shield);
 
