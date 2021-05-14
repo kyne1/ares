@@ -2,36 +2,12 @@ const refresh = require("libs/refresh");
 const fname = require("dir");
 const sapbomb = require("bullets/sapbomb");
 const comShield = require("abilities/commandShield");
+const pool = require("libs/poolhealth");
 //const searchInterval = 75;
 
 function sprite(name){
     return Core.atlas.find(name);
 }
-
-const laser = sprite("laser");
-const laserEnd = sprite("laser-end");
-
-function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
-    let angle1 = Angles.angle(x1, y1, x2, y2);
-    let vx = Mathf.cosDeg(angle1), vy = Mathf.sinDeg(angle1);
-    let len1 = size1 / 2 - 1.5, len2 = size2 / 2 - 1.5;
-    //print(Drawf);
-    Draw.color(Color.valueOf("#bf8bce"), 0.8);
-    Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
-}
-//returns an angle
-
-function toRad(angle){
-    return (angle * Math.PI/180);
-}
-
-function toDeg(angle){
-    return (angle * 180/Math.PI);
-}
-
-function angleTo(xf,yf,xi,yi){
-    return toDeg(Math.atan2(yf-yi,xf-xi));
-};
 
 const swarm = extend(UnitType, "swarm",{
     load(){
@@ -40,7 +16,7 @@ const swarm = extend(UnitType, "swarm",{
     },
     init(){
         this.super$init();
-        this.localizedName = "Swarm";
+        this.localizedName = "locust";
     },
     description: "Carpet bomber with forcefields",
     health: 90,
@@ -72,79 +48,20 @@ swarm.constructor = () => extend(UnitEntity,{
     sumh: 0,
     update(){
         this.super$update();
-        if(this.isCommanding()){
-            //kill everyone if pool is near zero
-            let helth = 0;
-            this.controlling.forEach(u => {
-                //this.maxh += u.maxHealth;
-                helth += u.health;
-                //print(u.shield);
-            });
-            helth += this.health;
-            this.sumh = helth;
-
-            if(this.sumh <= 1){
-                this.controlling.forEach(u => {
-                    u.kill();
-                });
-                this.kill();
-                //this.formation = null;
-            }
-
-            let percentage = this.sumh/this.maxh;
-            this.controlling.forEach(u => {
-                u.health = u.type.health*percentage;
-            });
-            this.health = this.type.health*percentage;
-        }
+        pool.update(this);
     },
     clearCommand(){
-        //print(this);
         //undo health pooling
-        if(this.isCommanding()){
-            this.groupsize = 0;
-            this.maxh = 0;
-            this.sumh = 0;
-            this.controlling.forEach(u => {
-                let has = false;
-                u.abilities.forEach(ab => {
-                    if(ab instanceof ForceFieldAbility){
-                        has = true;
-                    }
-                });
-                if(!has){
-                    u.shield = 0;
-                }
-            });
-        }
+        pool.clearCommand(this);
         this.super$clearCommand();
-        //inc++;
     },
     command(formation, units){
         this.super$command(formation, units);
-        //print(this);
-        units.forEach(u => {
-            this.maxh += u.maxHealth;
-            this.sumh += u.health;
-            //print(u.health);
-            this.groupsize++;
-        });
-        //print(this.sumh);
-        this.maxh += this.maxHealth;
-        this.sumh += this.health;
-        //print(this.groupsize);
+        pool.command(this,formation,units);
     },
     draw(){
         this.super$draw();
-        if(this.isCommanding()){
-            Draw.z(Layer.flyingUnit-1);
-            this.controlling.forEach(u=>{
-                drawLaser(this.team,
-                    this.x,this.y,
-                    u.x,u.y,
-                    u.type.hitSize,this.type.hitSize);
-            });
-        }
+        pool.draw(this);
     },
 });
 
@@ -165,6 +82,8 @@ bomb.shrinkY = 0.6;
 bomb.shrinkX = 0.4;
 bomb.despawnEffect = Fx.flakExplosion;
 bomb.maxRange = 85;
+bomb.status = StatusEffects.sapped;
+bomb.statusDuration = 60*10;
 //bomb.color = Color.valueOf("bf92f9");
 
 
@@ -188,10 +107,11 @@ swarm.weapons.add(swarmgun);
 
 swarm.defaultController = () => extend(FlyingAI,{});
 
-//radius regen max cooldown
-const shield = new comShield(15,1,65,50);
-const shield1 = new ForceFieldAbility(15,1,65,50);
+//@params: radius regen max cooldown
+const shield = new comShield(15,1,65,50); //shield give group
+const shield1 = new ForceFieldAbility(15,1,65,50); //shield give self
 swarm.abilities.add(shield);
 swarm.abilities.add(shield1);
 
 refresh(swarm);
+module.exports = swarm;

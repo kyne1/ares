@@ -1,3 +1,5 @@
+//declare all files needed under each script folder
+
 const units = [
   "ares",
   "gausstank",
@@ -43,6 +45,7 @@ bullets.forEach(i => {
 });
 
 require('libs/refresh');
+require("libs/poolhealth");
 require('fx/fixedtrail');
 require('dir');
 

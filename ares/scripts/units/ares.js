@@ -230,13 +230,12 @@ z.constructor = () => extend(UnitEntity, {
 });
 
 //format ripped from goldmod, (amt, max, rld, range)
-const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 32,140,180,10);
+const zshield = new JavaAdapter(ShieldRegenFieldAbility, {}, 32,140,60*8,10);
 //const ashield = new JavaAdapter(ShieldRegenFieldAbility, {}, 1500,3000,1000,100);
 z.abilities.add(zshield);
 //a.abilities.add(ashield);
 
 
-//event listernerns dont need loope
 const sbf = extend(BasicBulletType, {
   width: 5,
   height: 7,

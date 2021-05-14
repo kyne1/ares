@@ -1,11 +1,12 @@
 const trail = require("fx/fixedtrail");
 
 
-//@params penmod, armormod are functions, see below.
+//@params: penmod, armormod 
+//they are functions, see below for example.
 module.exports = function getBullet(armormod, penmod){
     const bull = extend(BasicBulletType, {
         //only registers units hit
-        //entity hitboxc -> can be treated as unit
+        //Hitboxc entity can be treated as just unit
         hitEntity( b,  entity,  initialHealth){
             if(entity instanceof Healthc){
                 let a = armormod(entity.armor)
@@ -46,8 +47,6 @@ module.exports = function getBullet(armormod, penmod){
         speed: 16.6,
         drag: 0,
         damage: 60, //treated as baseDamage
-        //makeFire: true,
-        //status: StatusEffects.burning,
         lifetime: 26,
         pierce: true,
         pierceBuilding: true
@@ -55,12 +54,8 @@ module.exports = function getBullet(armormod, penmod){
     return bull;
 }
 
-//sample for armormod and penmod:
-//@params a -> armor
-//@params t -> unit
-
 //returns a modifier that multiplies the damage
-//example: very efficient when dealing with low armor but whiffs high armor
+//this example: very efficient when dealing with low armor but whiffs high armor
 function aMod(a){
     if(a < 3){
         return 20;
@@ -73,7 +68,7 @@ function pMod(a){
     return 1;
 }
 
-//effect
+//thorium trail effect
 const ef = new Effect(6, e => {
     for(let i = 0; i < 2; i++){
         Draw.z()
@@ -87,6 +82,7 @@ const ef = new Effect(6, e => {
     }
 });
 
+//hit effect
 const penEf = new Effect(5, 130, e => {
     for(let i = 0; i < 2; i++){
         Draw.color(i == 0 ? Pal.thoriumPink : Pal.bulletYellow);

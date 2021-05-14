@@ -68,9 +68,10 @@ const tank = extend(UnitType, "gausstank",{
     },
     init(){
         this.super$init();
-        this.localizedName = "tank";
+        this.localizedName = "shredder";
     },
     drawWeapons(unit){
+        //draw cell sprite onto turret
         this.super$drawWeapons(unit);
         let mrotation = unit.mounts[0].rotation;
         let recoil = -((unit.mounts[0].reload) / tankgun.reload * tankgun.recoil);
@@ -138,11 +139,9 @@ tank.constructor = () => extend(MechUnit,{
         Draw.z(Layer.groundUnit-1);
         for(let j = -1; j <= 1; j+=2){
             let k = Math.max(j,0);
-            //if(isNaN(this.changerot)) print("true");
-            //this.trackmove[k] += 1;
-            this.trackmove[k] += Math.sin(toRad(r)-Math.atan2(this.changepos.y,this.changepos.x))*Vec2Len(this.changepos) + toRad(j*this.changerot)*paddlex*2;
-            //if(!(isNaN(r)||isNaN(this.changepos.y)||isNaN(this.changepos.x))){ print(isNaN(r)+" "+isNaN(this.changepos.y)+" "+isNaN(this.changepos.x));}
             
+            //determine how much this track move
+            this.trackmove[k] += Math.sin(toRad(r)-Math.atan2(this.changepos.y,this.changepos.x))*Vec2Len(this.changepos) + toRad(j*this.changerot)*paddlex*2;
             var center = new Vec2(
                 j*paddlex,
                 -(paddlestart - paddlespan - spacing)
@@ -176,8 +175,6 @@ tank.constructor = () => extend(MechUnit,{
                     j*paddlex,
                     spacing*i - paddlestart + this.trackmove[k]
                 );
-                // a.paddle, this.paddle will not work
-                //the ones on the end flickers for some reason
                 Draw.rect(tank.track,
                     this.x + Angles.trnsx(r,pos.x, pos.y),
                     this.y + Angles.trnsy(r,pos.x, pos.y),
