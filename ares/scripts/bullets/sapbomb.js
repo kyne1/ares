@@ -6,6 +6,7 @@ function Vec2Len(x,y){
     return Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
 }
 
+//gives a custom bomb bullet type that inherit velocity of unit when fired but limit it to a maxSpeed
 module.exports = function b(){
     const bean = extend(BombBulletType,{
         maxSpeed: 3,

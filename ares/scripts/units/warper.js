@@ -1,7 +1,6 @@
 const refresh = require("libs/refresh");
 const fname = require("dir");
-
-//const searchInterval = 75;
+const pool = require("libs/poolhealth");
 
 function sprite(name){
     return Core.atlas.find(name);
@@ -25,9 +24,8 @@ function drawLaser(team,  x1,  y1,  x2,  y2,  size1,  size2){
     Drawf.laser(team, laser, laserEnd, x1 + vx*len1, y1 + vy*len1, x2 - vx*len2, y2 - vy*len2, 0.25);
 }
 
+//draw an orb
 function drawOrb(x, y, size, opacity){
-    //Draw.reset();
-    //Drawf.light(x, y, size*3, Color.valueOf("#dfcfef"), 1);
     Draw.z(Layer.bullet);
     Draw.color(Color.valueOf("#a751fd"), 0.2*opacity)
     Fill.circle(x, y, size*1.15);
@@ -44,10 +42,10 @@ function scaleOrb(x,y,sizei,sizef,percent){
     drawOrb(x,y,sizei+fin(percent)*(sizef-sizei),1);
 }
 
+//asymptotic approach to 1 (100%)
 function fin(percent){
-    return 1 - Math.pow(2,-Math.min(percent,1)*6); //1-2^(-6x)
+    return 1 - Math.pow(2,-Math.min(percent,1)*6); 
 }
-//returns an angle
 
 function toRad(angle){
     return (angle * Math.PI/180);
@@ -68,7 +66,7 @@ const warper = extend(UnitType, "warper",{
     },
     init(){
         this.super$init();
-        this.localizedName = "Mage";
+        this.localizedName = "firefly";
     },
     description: "Summons and launches electric orbs. Attack from distance. Manual control recommended.",
     health: 560,
@@ -98,42 +96,12 @@ warper.constructor = () => extend(UnitEntity,{
     sumh: 0,
     searchTimer: 0,
     orbrot: 0,
-    orbpos: {},
+    orbpos: {}, //positions of orbs, make position sync between draw and bullet spawn easyer
     orbready: 0,
     orbtimer: 0,
     update(){
         this.super$update();
-        //print(this.isShooting); //will work without weapons
-        //print(this.units); //this.units -> formation members
-        //print(this.isCommanding()) //isCommanding()
-        //print(mount.reload);
-        //randomize firing interval
-        if(this.isCommanding()){
-            //kill everyone if pool is near zero
-            let helth = 0;
-            this.controlling.forEach(u => {
-                //this.maxh += u.maxHealth;
-                helth += u.health;
-                //print(helth);
-            });
-            helth += this.health;
-            this.sumh = helth;
-
-            if(this.sumh <= 1){
-                this.controlling.forEach(u => {
-                    u.kill();
-                });
-                this.kill();
-                //this.formation = null;
-            }
-
-            let percentage = this.sumh/this.maxh;
-            this.controlling.forEach(u => {
-                u.health = u.type.health*percentage;
-            });
-            this.health = this.type.health*percentage;
-        }
-
+        pool.update(this);
         this.orbrot += rotateSpeed*Time.delta;
         for(let i = 0; i < orbs; i++){
             let rot = toRad(this.orbrot + i*360/orbs);
@@ -147,18 +115,18 @@ warper.constructor = () => extend(UnitEntity,{
         
 
         this.orbtimer += Time.delta;
+
         //slowly gain orbs
         if(this.orbtimer >= orbReload && this.orbready < orbs){
             this.orbready ++;
             this.orbtimer = 0;
         }
         
-
+        //if not a player nor under command
         if(!this.isPlayer() && !(this.controller instanceof FormationAI)){
             let target = Units.closestTarget(this.team, this.x,this.y, this.type.range)
             if(target != null) this.isShooting = true;
         }
-        //if(this.mounts[0].shoot)print(this.mounts[0].shoot);
 
         if(this.isShooting && this.orbready > 0){
             //print("h");
@@ -178,42 +146,18 @@ warper.constructor = () => extend(UnitEntity,{
         }
     },
     clearCommand(){
-        //print(this);
-        //undo health pooling
-        if(this.isCommanding()){
-            this.groupsize = 0;
-            this.maxh = 0;
-            this.sumh = 0;
-            
-        }
+        pool.clearCommand(this);
         this.super$clearCommand();
         //inc++;
     },
     command(formation, units){
         this.super$command(formation, units);
-        //print(this);
-        units.forEach(u => {
-            this.maxh += u.maxHealth;
-            this.sumh += u.health;
-            //print(u.health);
-            this.groupsize++;
-        });
-        //print(this.sumh);
-        this.maxh += this.maxHealth;
-        this.sumh += this.health;
-        //print(this.groupsize);
+        pool.command(this,formation,units);
     },
     draw(){
         this.super$draw();
-        if(this.isCommanding()){
-            Draw.z(Layer.flyingUnit-1);
-            this.controlling.forEach(u=>{
-                drawLaser(this.team,
-                    this.x,this.y,
-                    u.x,u.y,
-                    this.type.hitSize,u.type.hitSize);
-            });
-        }
+        pool.draw(this);
+        //draw orbiting orbs
         try{
 
             if(this.orbtimer >= orbReload * animStart && this.orbready < orbs && this.orbtimer <= orbReload){

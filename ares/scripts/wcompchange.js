@@ -1,3 +1,6 @@
+//useless
+
+
 //weaponscomp
 const wcomp = cons(()=> {
   var w = new JavaAdapter(WeaponsComp, {
