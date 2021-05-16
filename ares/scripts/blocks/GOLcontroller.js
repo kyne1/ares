@@ -2,7 +2,7 @@ var sim = require('blocks/simBlock');
 var blockList = sim.list;
 var simBlock = sim.block;
 
-//global variable for simulation
+//global variables for simulation
 var updateSpeed = 0;
 var paused = true;
 var timer = 0;
@@ -29,6 +29,7 @@ const controller = extend(Wall, "controller", {
     configurable: true,
 });
 
+//build cost
 controller.setupRequirements(Category.logic, ItemStack.with(
     Items.silicon, 53,
     Items.titanium, 25,
@@ -43,27 +44,29 @@ controller.buildType = ent => {
         init(tile,  team,  shouldAdd,  rotation){
             return this.super$init(tile,  team,  shouldAdd,  rotation);
         },
+        //UI that shows when clicked
         buildConfiguration(table){
             if(paused){
                 this.pauseIcon = Icon.play;
             }
             else this.pauseIcon = Icon.pause;
+            //pause
             table.button(this.pauseIcon, Styles.clearTransi, () => {
                 paused = !paused;
-                //force an update
+                //force an update to update appearnce of pauseIcon
                 table.clearChildren();
                 this.buildConfiguration(table);
             }).size(40);
 
+            //do 1 blocks update
             table.button(Icon.refresh, Styles.clearTransi, ()=>{
                 paused = true;
                 simUpdate();
-                //timer = 5;
                 table.clearChildren();
                 this.buildConfiguration(table);
             }).size(40);
 
-            //clear button
+            //clear all blocks button
             table.button(Icon.cancel, Styles.clearTransi, () => {
                 blockList.forEach(function(value,key,map){
                     value.tile.remove();
@@ -71,7 +74,7 @@ controller.buildType = ent => {
                 blockList.clear();
             }).size(40);
 
-            //copy and translate from sharustry
+            //slider copy and translated from sharustry varlogic
             let slide = new Slider(0.1, 1, 0.01, false);
             slide.setValue(updateSpeed);
             slide.moved(i => updateSpeed = i);
@@ -85,9 +88,7 @@ controller.buildType = ent => {
     return ent;
 }
 
-/*Timer.schedule(e => {
-    print(Math.random());
-}, 0, 0.1/updateSpeed);*/
+//lets the gol blocks update run independent of controller's update. reduce impact on fps and allows larger GOL simulations
 Events.run(Trigger.update, () => {
     //print("h");
     if(!paused){
@@ -99,18 +100,16 @@ Events.run(Trigger.update, () => {
     }
 });
 
-//update simBlock
+//update simBlocks
 function simUpdate(){
-    // blocklist index
+    //array of indices of blocklist to be removed
     let killList = Array();
-    //cache checked points as well as storing whether has a block or not at that point
 
-    //empty nearby
+    //empty blocks nearby all GOL block, can be used as shortcut to check where to spawn.
     let emptyMap = new Map();
     blockList.forEach(function(value,key,map){
         let c = 0; //counting
         let s = key.split(',');
-        //print(key);
         let x = parseInt(s[0]);
         let y = parseInt(s[1]);
         for(let j = 0; j < 8; j++){
@@ -122,14 +121,9 @@ function simUpdate(){
                 //print("debug");
                 c++;
             }
-            //add neighbors to temp map
+            //cache neighbors to temp map
             if(!emptyMap.has(a)){
-                //print(a);
-                //print(Vars.world.tile(x1,y1).block()==Blocks.air);
                 emptyMap.set(a,Vars.world.tile(x1,y1).block()==Blocks.air);
-                //print(Vars.world.tile(x1,y1).block()==Blocks.air);
-                //print(Vars.world.tile(x,y).block());
-                //print(Vars.world.tile(x,y));
             }
             //print(Vars.world.tile(x, y).block());
         }
@@ -142,39 +136,28 @@ function simUpdate(){
             killList.push(x+","+y);
         }
     });
-    //print(emptyMap.size);
-    //print(blockList.size);
-    //find empty space, falses
+
+    //read empty spaces around GOL blocks for spawning blocks
     emptyMap.forEach(function(value, key, map){
         let s = key.split(',');
         let x = parseInt(s[0]);
         let y = parseInt(s[1]);
-        //print(Vars.world.tile(x,y).block()==Blocks.air);
-        //print(value);
         if(value){
             let c = 0;
-            //281 231
+            //scan all 8 neighbors of a position
             for(let i = 0; i < 8; i++){
                 let x1 = x+rot8x(i);
                 let y1 = y+rot8y(i);
-                //print(x + "," + y);
-                //print(map.get(key));
                 let a = x1+","+y1;
                 if(map.has(a) && !map.get(a)){
-                    /*if(x == 267 && y == 292){
-                        print(map.has(266+","+292));
-                    }*/
-                    //print(a);
                     c++
                 };
-                //print(map.has(a));
             }
-            //print(c);
-            
+            //create block if is empty and 3 simblock nearby
             if(c == 3) Vars.world.tile(x, y).setBlock(simBlock, Team.sharded);
         }
     });
-    //remove blocks top-down
+    //remove blocks last to first
     for(let i = killList.length - 1; i >= 0; i--){
         blockList.get(killList[i]).tile.remove();
         blockList.delete(killList[i]);
@@ -190,7 +173,6 @@ function rot8x(i){
     else x = -1;
     return x;
 }
-
 function rot8y(i){
     let y;
     if((i+2)%4 == 0) y = 0;
@@ -199,6 +181,7 @@ function rot8y(i){
     return y;
 }
 
+//shortcut to create a string
 function coordString(x,y){
     return x+","+y;
 }
