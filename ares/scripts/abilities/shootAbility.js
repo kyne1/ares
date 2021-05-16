@@ -4,10 +4,9 @@ const a = require('units/ares');
 const fname = require('dir');
 
 //weapon variables
-var reload = 10;
+var reload = 7;
 var spread = 12;
-var range = 220; // radar range
-var rows = 4;//at least 2
+var rows = 5;//at least 2
 var rspeed = 3;
 var firecone = 5;
 
@@ -17,7 +16,8 @@ var ystart = 55;
 
 //properties for each turret
 var yoffset = 15.4; //bullet offset from barrel
-var xradaroffset = 30;
+var xradaroffset = 33;
+var range = 240; // radar range
 
 //deafen it
 var shootSound = loadSound("secondaryshoot");
@@ -33,19 +33,20 @@ var spacing = paddlespan/(paddlenum-1);
 //for each pair, on one side (right), then mirror it.
 //back , front
 var anglelimit = [
-    [110,-75], //back
+    [150,-75], //back
     [75,-75], //middle
     [75,-75], //middle
-    [75,-120], //front
+    [75,-75], //middle 
+    [75,-168], //front
 ];
 
 const bullet = extend(BasicBulletType, {
-    width: 7,
-    height: 15,
-    lifetime: 30,
-    speed: 12,
+    width: 9,
+    height: 16,
+    lifetime: 48,
+    speed: 8,
     damage: 65,
-    splashDamageRadius: 2,
+    splashDamageRadius: 24,
     splashDamage: 7,
     drag: 0,
     //pierce: true,
@@ -94,14 +95,15 @@ function toDeg(angle){
     return (angle * 180/Math.PI);
 }
 
+//store unit refpoints for each unit id to store diff. variables. better solutions have been found.
 var unitsMap = new Map();
 
 /*turret setup:
 0  3
 1  4
 2  5
-
 */
+
 //print("bullet "+ bullet);
 //ta for turret ability
 function getAbility(){

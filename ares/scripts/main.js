@@ -1,3 +1,5 @@
+//declare all files needed under each script folder
+
 const units = [
   "ares",
   "gausstank",
@@ -24,6 +26,12 @@ const bullets = [
   "sapbomb",
 ];
 
+const libs = [
+  "poolhealth",
+  "refresh",
+  "status"
+]
+
 
 
 units.forEach(i => {
@@ -42,7 +50,10 @@ bullets.forEach(i => {
   require("bullets/"+i);
 });
 
-require('libs/refresh');
+libs.forEach(i => {
+  require("libs/"+i);
+});
+
 require('fx/fixedtrail');
 require('dir');
 

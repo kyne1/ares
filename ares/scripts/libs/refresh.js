@@ -1,4 +1,5 @@
-//DeltaNedas's refresh lib
+//DeltaNedas's refresh lib prevent unit glitching out
+// dont forget to "classId: () => UnitType.classId"
 module.exports = unit => {
     // Register unit's name
     EntityMapping.nameMap.put(unit.name, unit.constructor);

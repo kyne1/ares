@@ -1,5 +1,6 @@
 //natvie array dont work
 //java arraylist dont work
+//map key hashed by block x,y positions
 var blockList = new Map();
 var locName = "sim block"
 
@@ -17,7 +18,7 @@ const simBlock = extend(Wall, "simblock", {
     hasShadow: false,
     size: 1,
     localizedName: locName,
-    description: "simulation block for a CA controller",
+    description: "simulation block for a GOL controller",
     destructible: true,
     health: 10,
     rebuildable: false,
@@ -31,20 +32,17 @@ simBlock.setupRequirements(Category.logic, ItemStack.with(
 ))
 
 simBlock.buildType = ent => {
-    //variable go here
+    //variable go here if any
     ent = extend(Wall.WallBuild, simBlock, {
         init(tile,  team,  shouldAdd,  rotation){
             let position = tile.x+","+tile.y;
-            //print(position);
             this.super$init(tile,  team,  shouldAdd,  rotation);
             blockList.set(position, this);
-            //print(this.tile.x);
-            //this.kill();
             return this;
         },
         //not normally used
         killed(){
-            //find and remove self
+            //find and remove self from the list
             let position = this.tile.x + "," + this.tile.y;
             blockList.delete(position);
             this.super$killed();
@@ -53,10 +51,12 @@ simBlock.buildType = ent => {
     return ent;
 }
 
+//checks when GOL block are being manually deleted by units or players, is different than killed()
 Events.on(BlockBuildEndEvent, e => {
     if(e.breaking && 
         //checks if e.tile.block is equal to simBlock
         //locName.localeCompare(e.tile.block().getDisplayName(e.tile).substring(0,locName.length)) == 0
+
         //nvm just use cblock
         e.tile.build.cblock == simBlock
         )

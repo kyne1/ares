@@ -27,7 +27,7 @@ const grouper = extend(UnitType, "grouper",{
     },
     init(){
         this.super$init();
-        this.localizedName = "Link";
+        this.localizedName = "mosquito";
     },
     description: "Rallies and pools the HP of all units under its command",
     health: 375,
@@ -52,22 +52,19 @@ const grouper = extend(UnitType, "grouper",{
 
 grouper.constructor = () => extend(UnitEntity,{
     classId: () => grouper.classId, 
-    //healthList: Array(),
     groupsize: 0,
     maxh: 0,
     sumh: 0,
-    searchTimer: 0,
+    lasth: 0,
     update(){
         this.super$update();
-        //print(this.isShooting); //will work without weapons
-        //print(this.units); //this.units -> formation members
-        //print(this.isCommanding()) //isCommanding()
-        //print(mount.reload);
+
         //randomize firing interval
         let mount = this.mounts[0];
         if(mount.shoot && mount.reload == sapgun.reload){
             mount.reload -= Math.random()*(sapgun.reload-10);
         }
+
         if(this.isCommanding()){
             //kill everyone if pool is near zero
             let helth = 0;
@@ -93,16 +90,6 @@ grouper.constructor = () => extend(UnitEntity,{
             });
             this.health = this.type.health*percentage;
         }
-
-        //autogrouping for AI
-        /*if(!this.isPlayer() && this.groupsize < 5){
-            if(this.searchTimer >= searchInterval){
-                this.searchTimer = 0;
-                this.commandNearby(new CircleFormation());
-            }
-            else this.searchTimer += Time.delta;
-        }*/
-        //print(this.maxHealth+","+this.health);
     },
     clearCommand(){
         //print(this);
@@ -140,39 +127,6 @@ grouper.constructor = () => extend(UnitEntity,{
             });
         }
     },
-    /*commandNearby(pattern, include){
-        if(this.leader != null && this.leader.isAI()) return;
-        //importing variable from unit
-        let x = this.x;
-        let y = this.y;
-        let rotation = this.rotation;
-        let team = this.team;
-        let type = this.type;
-        let hitSize = this.hitSize;
-
-        let formation = new Formation(new Vec3(x, y, rotation), pattern);
-        formation.slotAssignmentStrategy = new DistanceAssignmentStrategy(pattern);
-
-        this.units.clear();
-
-        Units.nearby(team, x, y, 150, u => {
-            if(u != this && u.type.flying == type.flying && u.hitSize <= hitSize * 1.1){
-                //print(u.isAI());
-                if(u != this.leader && (u.leader == null || u.leader != this.leader)){
-                    //print("yes");
-                    this.units.add(u);
-                } 
-            }
-        });
-
-        if(this.units.isEmpty()) return;
-
-        //sort by hitbox size, then by distance
-        this.units.sort(Structs.comps(Structs.comparingFloat(u => -u.hitSize), Structs.comparingFloat(u => u.dst2(this))));
-        this.units.truncate(type.commandLimit);
-
-        this.command(formation, this.units);
-    },*/
 });
 
 const sapbullet = extend(SapBulletType,{
