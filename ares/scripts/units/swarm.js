@@ -48,6 +48,7 @@ swarm.constructor = () => extend(UnitEntity,{
     sumh: 0,
     lasth: 0,
     update(){
+        if(this.isCommanding())print(this.lasth);
         this.super$update();
         pool.update(this);
     },

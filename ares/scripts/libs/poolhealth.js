@@ -1,5 +1,6 @@
 const refresh = require("libs/refresh");
 const fname = require("dir");
+const status = require("libs/status");
 //const searchInterval = 75;
 
 
@@ -81,11 +82,15 @@ function command(unit,formation, units){
         unit.maxh += u.maxHealth;
         unit.sumh += u.health;
         //print(u.health);
+        /*u.apply(status.cmd);
+        unit.lasth += u.health;*/
         unit.groupsize++;
     });
     //print(unit.sumh);
     unit.maxh += unit.maxHealth;
     unit.sumh += unit.health;
+    /*unit.apply(status.cmd);
+    unit.lasth += unit.health;*/
     //print(unit.groupsize);
 };
 function draw(unit){

@@ -19,6 +19,7 @@ const blocks = [
   "shotgunblock",
   "GOLcontroller",
   "simBlock",
+  "minigun",
 ];
 
 const bullets = [

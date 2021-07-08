@@ -143,7 +143,7 @@ function getUnit(){
       //trick to renaming it without screwing stuff up
       this.localizedName = "icarus";
     },
-    description: "Heavy-hitting battlecruiser with an unusual method of propulsion. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
+    description: "Heavy-hitting battlecruiser. It has no movement AI and low HP for its size. Don't fly too close to the enemies.",
     health: 5600,
     //type: flying,
     speed: 1.2,
